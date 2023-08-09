@@ -211,26 +211,54 @@ namespace TestWPF
             var diagonalBubbleWidthOffset = diagonalBubbleWidth / 2;
             var diagonalBubbleLenght = Math.Sqrt(Math.Pow(_geometryCash.BubbleLenght, 2) / 2);
 
-            var xMidpoint = (bottomRight.X - topLeft.X) / 2 + topLeft.X;
-            var yMidpoint = (bottomRight.Y - topLeft.Y) / 2 + topLeft.Y;
+            var xMidpoint = (bottomRight.X + borderThickness.Right - topLeft.X - borderThickness.Left) / 2 + topLeft.X;
+            var yMidpoint = (bottomRight.Y + borderThickness.Bottom - topLeft.Y - borderThickness.Top) / 2 + topLeft.Y;
 
             // Left
             geometryContext.BeginFigure(leftBorderStart, true, true);
 
             if (_geometryCash.BubbleDirection == BubbleDirection.TopLeft)
             {
-                var firstAngleOffset = borderThickness.Left * (1 - topLeft.X / (topLeft.X + diagonalBubbleLenght));
+                var firstAngleOffset = borderThickness.Left * (1 - (topLeft.X - borderThickness.Left) / (topLeft.X + diagonalBubbleLenght));
 
-                var vectorTop = new Vector(1, borderThickness.Top);
-                var vectorLeft = new Vector(borderThickness.Left, 1);
+                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBubbleLenght / (diagonalBubbleLenght + (topLeft.X - borderThickness.Left)));
 
-                var test = Vector.Multiply(vectorTop, vectorLeft);
+                var bubbleStartPoint = new Point(topLeft.X, topLeft.Y - borderThickness.Top + diagonalBubbleWidth - firstAngleOffset);
+                var bubbleEndPoint = new Point(topLeft.X - borderThickness.Left + diagonalBubbleWidth - thirdAngleOffset, topLeft.Y);
 
-                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBubbleLenght / (diagonalBubbleLenght + topLeft.X));
+                geometryContext.LineTo(bubbleStartPoint, true, false);
 
-                geometryContext.LineTo(new Point(topLeft.X, topLeft.Y - borderThickness.Top + diagonalBubbleWidth - firstAngleOffset), true, false);
-                geometryContext.LineTo(new Point(topLeft.X - (diagonalBubbleLenght - diagonalBubbleWidthOffset), topLeft.Y - (diagonalBubbleLenght - diagonalBubbleWidthOffset)), true, false);
-                geometryContext.LineTo(new Point(topLeft.X - borderThickness.Left + diagonalBubbleWidth - thirdAngleOffset, topLeft.Y), true, false);
+                var actualTopLeft = new Point(topLeft.X - (diagonalBubbleLenght - diagonalBubbleWidthOffset) - borderThickness.Left, topLeft.Y - (diagonalBubbleLenght - diagonalBubbleWidthOffset) - borderThickness.Top);
+
+                var firstCalculationPoint = new Point(actualTopLeft.X, actualTopLeft.Y - borderThickness.Left - firstAngleOffset);
+                var secondCalculationPoint = new Point(actualTopLeft.X - borderThickness.Top - thirdAngleOffset, actualTopLeft.Y);
+
+                var firstDistance = Math.Sqrt(Math.Pow(firstCalculationPoint.X - secondCalculationPoint.X, 2) + Math.Pow(secondCalculationPoint.Y - firstCalculationPoint.Y, 2));
+                var secondDistance = Math.Sqrt(Math.Pow(bubbleEndPoint.X - bubbleStartPoint.X, 2) + Math.Pow(bubbleStartPoint.Y - bubbleEndPoint.Y, 2));
+
+                var ratio = 0.0;
+
+                if (firstDistance > 0)
+                {
+                    var total = firstDistance + secondDistance;
+
+                    ratio = firstDistance / total;
+                }
+
+                var medianCalculationDistance = Math.Sqrt(Math.Pow(bubbleEndPoint.X - firstCalculationPoint.X, 2) + Math.Pow(bubbleEndPoint.Y - firstCalculationPoint.Y, 2)) * ratio;
+
+                var medianOffset = Math.Sqrt(medianCalculationDistance * medianCalculationDistance / 2);
+
+                var firstMedian = new Point(firstCalculationPoint.X + medianOffset, firstCalculationPoint.Y + medianOffset);
+                var secondMedian = new Point(secondCalculationPoint.X + medianOffset, secondCalculationPoint.Y + medianOffset);
+
+                var centerMedianOffset = Math.Sqrt(Math.Pow(firstMedian.X - secondMedian.X, 2) + Math.Pow(secondMedian.Y - firstMedian.Y, 2)) * 0.5;
+
+                var median = new Point(secondMedian.X + (firstMedian.X - secondMedian.X) / 2, firstMedian.Y + (secondMedian.Y - firstMedian.Y) / 2);
+
+                geometryContext.LineTo(median, true, false);
+                
+                geometryContext.LineTo(bubbleEndPoint, true, false);
             }
             else
             {

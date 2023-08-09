@@ -63,23 +63,24 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <!--<local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True">
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True">
             <Border Width="50" Height="50" Background="Gray" BorderBrush="Black" BorderThickness="1">
 
             </Border>
-        </local:AdornerPopupDefinition>-->
+        </local:AdornerPopupDefinition>
 
         <Canvas Grid.Row="1">
-            <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta"/>
+            <Thumb x:Name="TestThumb" Height="28" Width="100" DragDelta="TestThumb_DragDelta"/>
 
-            <local:GeometryTest>
-                <local:GeometryTest.RenderTransform>
-                    <RotateTransform Angle="0"/>
-                </local:GeometryTest.RenderTransform>
-            </local:GeometryTest>
+            <local:Bubble BubbleDirection="TopLeft" BorderBrush="Black" Background="White" BorderThickness="1 2 1 1" CornerRadius="5" BubbleWidth="15" BubbleLenght="30">
+                <TextBlock Text="Cooler Baloon Poptip" Margin="5"/>
+            </local:Bubble>
 
-            <local:Bubble BubbleDirection="TopLeft" BorderBrush="Red" Background="Transparent" BorderThickness="1 5 1 1" CornerRadius="5" BubbleWidth="10" BubbleLenght="15">
-                <Border Width="100" Height="50" Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="3 3 2 3"/>
+            <local:Bubble BubbleDirection="TopLeft" BorderBrush="DarkSlateBlue" Background="GreenYellow" BorderThickness="1 2 1 1" CornerRadius="5" BubbleWidth="15" BubbleLenght="20">
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="Vorgang erfolgreich abgeschlossen" VerticalAlignment="Center"/>
+                    <Image Source="C:\Users\N.Groh\Pictures\Cat.webp" Width="100" Margin="5 0 0 0"/>
+                </StackPanel>
             </local:Bubble>
         </Canvas>
     </Grid>
