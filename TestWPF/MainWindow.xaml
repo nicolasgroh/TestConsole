@@ -63,25 +63,23 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True">
+        <!--<local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True">
             <Border Width="50" Height="50" Background="Gray" BorderBrush="Black" BorderThickness="1">
 
             </Border>
-        </local:AdornerPopupDefinition>
+        </local:AdornerPopupDefinition>-->
 
         <Canvas Grid.Row="1">
             <Thumb x:Name="TestThumb" Height="28" Width="100" DragDelta="TestThumb_DragDelta"/>
 
-            <local:Bubble BubbleDirection="TopLeft" BorderBrush="Black" Background="White" BorderThickness="1 2 1 1" CornerRadius="5" BubbleWidth="15" BubbleLenght="30">
-                <TextBlock Text="Cooler Baloon Poptip" Margin="5"/>
-            </local:Bubble>
-
-            <local:Bubble BubbleDirection="TopLeft" BorderBrush="DarkSlateBlue" Background="GreenYellow" BorderThickness="1 2 1 1" CornerRadius="5" BubbleWidth="15" BubbleLenght="20">
+            <local:Balloon BalloonDirection="TopLeft" BorderBrush="#FF45CE6D" Background="#FFDEFFAB" BorderThickness="1 2 1 1" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
+                <local:Balloon.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.6"/>
+                </local:Balloon.Effect>
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="Vorgang erfolgreich abgeschlossen" VerticalAlignment="Center"/>
-                    <Image Source="C:\Users\N.Groh\Pictures\Cat.webp" Width="100" Margin="5 0 0 0"/>
+                    <TextBlock Text="Erfolgreich!" Foreground="#FF45CE6D" VerticalAlignment="Center"/>
                 </StackPanel>
-            </local:Bubble>
+            </local:Balloon>
         </Canvas>
     </Grid>
 </Window>
