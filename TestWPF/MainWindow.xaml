@@ -72,13 +72,9 @@
         <Canvas Grid.Row="1">
             <Thumb x:Name="TestThumb" Height="28" Width="100" DragDelta="TestThumb_DragDelta"/>
 
-            <local:Balloon BalloonDirection="TopLeft" BorderBrush="#FF45CE6D" Background="#FFDEFFAB" BorderThickness="1 2 1 1" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
-                <local:Balloon.Effect>
-                    <DropShadowEffect BlurRadius="10" Opacity="0.6"/>
-                </local:Balloon.Effect>
-                <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBlock Text="Erfolgreich!" Foreground="#FF45CE6D" VerticalAlignment="Center"/>
-                </StackPanel>
+            <local:Balloon BalloonDirection="TopLeft" BorderBrush="#FF45CE6D" Background="#FFF0FFD8" BorderThickness="1 5 1 1" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
+                
+                    <TextBlock Text="Erfolgreich!" Margin="5" Foreground="#FF45CE6D" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </local:Balloon>
         </Canvas>
     </Grid>
