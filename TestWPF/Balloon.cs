@@ -207,9 +207,11 @@ namespace TestWPF
             var bottomBorderStart = new Point(bottomRight.X - Math.Max(_geometryCash.CornerRadius.BottomRight - borderThickness.Right, 0), bottomRight.Y);
             var bottomBorderEnd = new Point(topLeft.X + Math.Max(_geometryCash.CornerRadius.BottomLeft - borderThickness.Left, 0), bottomRight.Y);
 
-            var diagonalBalloonWidth = Math.Sqrt(_geometryCash.BalloonWidth * _geometryCash.BalloonWidth / 2);
+            var diagonalBalloonWidth = Math.Sqrt(Math.Pow(_geometryCash.BalloonWidth, 2) / 2);
             var diagonalBalloonWidthOffset = diagonalBalloonWidth / 2;
             var diagonalBalloonLenght = Math.Sqrt(Math.Pow(_geometryCash.BalloonLenght, 2) / 2);
+            var diagonalBalloonOffset1 = diagonalBalloonLenght - diagonalBalloonWidthOffset;
+            var diagonalBalloonOffset2 = diagonalBalloonLenght - diagonalBalloonWidthOffset + diagonalBalloonWidth;
 
             var xMidpoint = (bottomRight.X + borderThickness.Right - topLeft.X - borderThickness.Left) / 2 + topLeft.X;
             var yMidpoint = (bottomRight.Y + borderThickness.Bottom - topLeft.Y - borderThickness.Top) / 2 + topLeft.Y;
@@ -219,16 +221,16 @@ namespace TestWPF
 
             if (_geometryCash.BalloonDirection == BalloonDirection.TopLeft)
             {
-                var firstAngleOffset = borderThickness.Left * (1 - (topLeft.X - borderThickness.Left) / (topLeft.X + diagonalBalloonLenght));
+                var firstAngleOffset = borderThickness.Left * (1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
-                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBalloonLenght / (diagonalBalloonLenght + (topLeft.X - borderThickness.Left)));
+                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBalloonOffset1 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
                 var balloonStartPoint = new Point(topLeft.X, topLeft.Y - borderThickness.Top + diagonalBalloonWidth - firstAngleOffset);
                 var balloonEndPoint = new Point(topLeft.X - borderThickness.Left + diagonalBalloonWidth - thirdAngleOffset, topLeft.Y);
 
                 geometryContext.LineTo(balloonStartPoint, true, false);
 
-                var actualTargetCorner = new Point(topLeft.X - (diagonalBalloonLenght - diagonalBalloonWidthOffset) - borderThickness.Left, topLeft.Y - (diagonalBalloonLenght - diagonalBalloonWidthOffset) - borderThickness.Top);
+                var actualTargetCorner = new Point(topLeft.X - diagonalBalloonOffset1 - borderThickness.Left, topLeft.Y - diagonalBalloonOffset1 - borderThickness.Top);
 
                 var firstCalculationPoint = new Point(actualTargetCorner.X, actualTargetCorner.Y - borderThickness.Left - firstAngleOffset);
                 var secondCalculationPoint = new Point(actualTargetCorner.X - borderThickness.Top - thirdAngleOffset, actualTargetCorner.Y);
@@ -292,16 +294,16 @@ namespace TestWPF
 
             if (_geometryCash.BalloonDirection == BalloonDirection.TopRight)
             {
-                var firstAngleOffset = borderThickness.Top * (1 - diagonalBalloonLenght / (diagonalBalloonLenght + (bottomRight.X + borderThickness.Right)));
+                var firstAngleOffset = borderThickness.Top * (1 - diagonalBalloonOffset1 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
-                var thirdAngleOffset = borderThickness.Right * (1 - (bottomRight.X + borderThickness.Right) / (bottomRight.X + diagonalBalloonLenght));
+                var thirdAngleOffset = borderThickness.Right * (1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
                 var balloonStartPoint = new Point(bottomRight.X + borderThickness.Right - diagonalBalloonWidth + firstAngleOffset, topLeft.Y);
                 var balloonEndPoint = new Point(bottomRight.X, topLeft.Y - borderThickness.Top + diagonalBalloonWidth - thirdAngleOffset);
 
                 geometryContext.LineTo(balloonStartPoint, true, false);
 
-                var actualTargetCornern = new Point(bottomRight.X + (diagonalBalloonLenght - diagonalBalloonWidthOffset) + borderThickness.Right, topLeft.Y - (diagonalBalloonLenght - diagonalBalloonWidthOffset) - borderThickness.Top);
+                var actualTargetCornern = new Point(bottomRight.X + diagonalBalloonOffset1 + borderThickness.Right, topLeft.Y - diagonalBalloonOffset1 - borderThickness.Top);
 
                 var firstCalculationPoint = new Point(actualTargetCornern.X + borderThickness.Top + firstAngleOffset, actualTargetCornern.Y);
                 var secondCalculationPoint = new Point(actualTargetCornern.X, actualTargetCornern.Y - borderThickness.Right - thirdAngleOffset);
@@ -330,7 +332,7 @@ namespace TestWPF
             {
                 geometryContext.LineTo(topBorderEnd, true, false);
 
-                if (_geometryCash.CornerRadius.TopRight > 0 && _geometryCash.BalloonDirection != BalloonDirection.TopRight)
+                if (_geometryCash.CornerRadius.TopRight > 0)
                 {
                     geometryContext.ArcTo(rightBorderStart,
                         new Size(Math.Max(_geometryCash.CornerRadius.TopRight - borderThickness.Right, 0), Math.Max(_geometryCash.CornerRadius.TopRight - borderThickness.Top, 0)),
@@ -351,13 +353,52 @@ namespace TestWPF
                 geometryContext.LineTo(new Point(rightBorderEnd.X, yMidpoint + _geometryCash.BalloonWidth / 2 - yAngleOffset), true, false);
             }
 
-            geometryContext.LineTo(rightBorderEnd, true, false);
-
-            if (_geometryCash.CornerRadius.BottomRight > 0 && _geometryCash.BalloonDirection != BalloonDirection.BottomRight)
+            if (_geometryCash.BalloonDirection == BalloonDirection.BottomRight)
             {
-                geometryContext.ArcTo(bottomBorderStart,
-                    new Size(Math.Max(_geometryCash.CornerRadius.BottomRight - borderThickness.Right, 0), Math.Max(_geometryCash.CornerRadius.BottomRight - borderThickness.Bottom, 0)),
-                    0.0, false, SweepDirection.Clockwise, true, false);
+                var firstAngleOffset = borderThickness.Right * (1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
+
+                var thirdAngleOffset = borderThickness.Bottom * (1 - diagonalBalloonOffset1 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
+
+                var balloonStartPoint = new Point(bottomRight.X, bottomRight.Y + borderThickness.Bottom - diagonalBalloonWidth + firstAngleOffset);
+                var balloonEndPoint = new Point(bottomRight.X + borderThickness.Right - diagonalBalloonWidth + thirdAngleOffset, bottomRight.Y);
+
+                geometryContext.LineTo(balloonStartPoint, true, false);
+
+                var actualTargetCornern = new Point(bottomRight.X + diagonalBalloonOffset1 + borderThickness.Right, bottomRight.Y + diagonalBalloonOffset1 + borderThickness.Bottom);
+
+                var firstCalculationPoint = new Point(actualTargetCornern.X, actualTargetCornern.Y + borderThickness.Right + firstAngleOffset);
+                var secondCalculationPoint = new Point(actualTargetCornern.X + borderThickness.Bottom + thirdAngleOffset, actualTargetCornern.Y);
+
+                var firstDistance = Math.Sqrt(Math.Pow(secondCalculationPoint.X - firstCalculationPoint.X, 2) + Math.Pow(firstCalculationPoint.Y - secondCalculationPoint.Y, 2));
+                var secondDistance = Math.Sqrt(Math.Pow(balloonStartPoint.X - balloonEndPoint.X, 2) + Math.Pow(balloonEndPoint.Y - balloonStartPoint.Y, 2));
+
+                var total = firstDistance + secondDistance;
+
+                var ratio = firstDistance / total;
+
+                var medianCalculationDistance = Math.Sqrt(Math.Pow(firstCalculationPoint.X - balloonEndPoint.X, 2) + Math.Pow(firstCalculationPoint.Y - balloonEndPoint.Y, 2)) * ratio;
+
+                var medianOffset = Math.Sqrt(medianCalculationDistance * medianCalculationDistance / 2);
+
+                var firstMedian = new Point(firstCalculationPoint.X - medianOffset, firstCalculationPoint.Y - medianOffset);
+                var secondMedian = new Point(secondCalculationPoint.X - medianOffset, secondCalculationPoint.Y - medianOffset);
+
+                var median = new Point(secondMedian.X - (secondMedian.X - firstMedian.X) / 2, firstMedian.Y - (firstMedian.Y - secondMedian.Y) / 2);
+
+                geometryContext.LineTo(median, true, false);
+
+                geometryContext.LineTo(balloonEndPoint, true, false);
+            }
+            else
+            {
+                geometryContext.LineTo(rightBorderEnd, true, false);
+
+                if (_geometryCash.CornerRadius.BottomRight > 0 && _geometryCash.BalloonDirection != BalloonDirection.BottomRight)
+                {
+                    geometryContext.ArcTo(bottomBorderStart,
+                        new Size(Math.Max(_geometryCash.CornerRadius.BottomRight - borderThickness.Right, 0), Math.Max(_geometryCash.CornerRadius.BottomRight - borderThickness.Bottom, 0)),
+                        0.0, false, SweepDirection.Clockwise, true, false);
+                }
             }
 
             // Bottom

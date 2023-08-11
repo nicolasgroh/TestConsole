@@ -16,11 +16,7 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            var test = new Point(5, 6);
-
-            test.Offset(2, 3);
-
-            Console.WriteLine(test);
+            
         }
 
         #region Gimeg SalesOrder Parsen
