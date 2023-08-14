@@ -63,18 +63,17 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <!--<local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True">
-            <Border Width="50" Height="50" Background="Gray" BorderBrush="Black" BorderThickness="1">
-
-            </Border>
-        </local:AdornerPopupDefinition>-->
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="False">
+            <local:Balloon BalloonDirection="Bottom" BorderBrush="Purple" Background="White" BorderThickness="2" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
+                <TextBlock Text="Erfolgreich!" Margin="5" Foreground="Purple" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </local:Balloon>
+        </local:AdornerPopupDefinition>
 
         <Canvas Grid.Row="1">
             <Thumb x:Name="TestThumb" Height="28" Width="100" DragDelta="TestThumb_DragDelta"/>
 
-            <local:Balloon BalloonDirection="TopRight" BorderBrush="#FF45CE6D" Background="#FFF0FFD8" BorderThickness="1 1 1 1" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
-                
-                    <TextBlock Text="Erfolgreich!" Margin="5" Foreground="#FF45CE6D" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <local:Balloon BalloonDirection="Bottom" BorderBrush="Purple" Background="White" BorderThickness="1" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
+                <TextBlock Text="Erfolgreich!" Margin="5" Foreground="Purple" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </local:Balloon>
         </Canvas>
     </Grid>
