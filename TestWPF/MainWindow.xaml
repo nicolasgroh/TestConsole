@@ -20,6 +20,9 @@
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="10" GlassFrameThickness="10"/>
     </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <local:PopupPlacementToBalloonDirectionConverter x:Key="PopupPlacementToBalloonDirectionConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -63,18 +66,14 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="False">
-            <local:Balloon BalloonDirection="Bottom" BorderBrush="Purple" Background="White" BorderThickness="2" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
-                <TextBlock Text="Erfolgreich!" Margin="5" Foreground="Purple" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Relative" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="False" UseDynamicPlacement="False" CenterOnPlacementTarget="True">
+            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" BorderBrush="Purple" Background="Purple" BorderThickness="0" CornerRadius="3" BalloonWidth="15" BalloonLenght="10">
+                <ContentPresenter Content="Test" Margin="10 5" TextElement.Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </local:Balloon>
         </local:AdornerPopupDefinition>
 
         <Canvas Grid.Row="1">
-            <Thumb x:Name="TestThumb" Height="28" Width="100" DragDelta="TestThumb_DragDelta"/>
-
-            <local:Balloon BalloonDirection="Bottom" BorderBrush="Purple" Background="White" BorderThickness="1" Width="100" CornerRadius="8" BalloonWidth="10" BalloonLenght="15">
-                <TextBlock Text="Erfolgreich!" Margin="5" Foreground="Purple" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </local:Balloon>
+            <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta"/>
         </Canvas>
     </Grid>
 </Window>

@@ -87,7 +87,7 @@
         </Setter>
     </Style>
     <!--#endregion-->
-
+    
     <Style TargetType="CalendarDayButton" x:Key="CalendarDayButtonStyle">
         <Setter Property="MinWidth" Value="5" />
         <Setter Property="MinHeight" Value="5" />
@@ -333,6 +333,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type local:PopupAdornern}">
+    <Style TargetType="{x:Type local:AdornerPopup}">
     </Style>
 </ResourceDictionary>

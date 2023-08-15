@@ -12,9 +12,9 @@ using System.Windows.Media;
 
 namespace TestWPF
 {
-    public class DecoratorAdorner : Adorner, IAddChild
+    public class AdornerDecorator : Adorner, IAddChild
     {
-        public DecoratorAdorner(UIElement adornedElement) : base(adornedElement)
+        public AdornerDecorator(UIElement adornedElement) : base(adornedElement)
         {
 
         }
@@ -23,7 +23,7 @@ namespace TestWPF
         {
             if (!(value is UIElement))
             {
-                throw new ArgumentException(null, nameof(value));
+                throw new ArgumentException("Value has to by of Type UIElement", nameof(value));
             }
 
             if (Child != null)

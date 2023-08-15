@@ -43,11 +43,25 @@ namespace TestWPF
             set { SetValue(PlacementTargetProperty, value); }
         }
 
-        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(PopupAdornerPlacementMode), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(PopupAdornerPlacementMode.Bottom));
-        public PopupAdornerPlacementMode PlacementMode
+        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom));
+        public AdornerPopupPlacementMode PlacementMode
         {
-            get { return (PopupAdornerPlacementMode)GetValue(PlacementModeProperty); }
+            get { return (AdornerPopupPlacementMode)GetValue(PlacementModeProperty); }
             set { SetValue(PlacementModeProperty, value); }
+        }
+
+        public static readonly DependencyProperty CenterOnPlacementTargetProperty = DependencyProperty.Register("CenterOnPlacementTarget", typeof(bool), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(true));
+        public bool CenterOnPlacementTarget
+        {
+            get { return (bool)GetValue(CenterOnPlacementTargetProperty); }
+            set { SetValue(CenterOnPlacementTargetProperty, value); }
+        }
+
+        public static readonly DependencyProperty UseDynamicPlacementProperty = DependencyProperty.Register("UseDynamicPlacement", typeof(bool), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(true));
+        public bool UseDynamicPlacement
+        {
+            get { return (bool)GetValue(UseDynamicPlacementProperty); }
+            set { SetValue(UseDynamicPlacementProperty, value); }
         }
 
         public static readonly DependencyProperty KeepWithinViewportProperty = DependencyProperty.Register("KeepWithinViewport", typeof(bool), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(true));
@@ -55,6 +69,20 @@ namespace TestWPF
         {
             get { return (bool)GetValue(KeepWithinViewportProperty); }
             set { SetValue(KeepWithinViewportProperty, value); }
+        }
+
+        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.Register("VerticalOffset", typeof(double), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(0.0));
+        public double VerticalOffset
+        {
+            get { return (double)GetValue(VerticalOffsetProperty); }
+            set { SetValue(VerticalOffsetProperty, value); }
+        }
+
+        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(0.0));
+        public double HorizontalOffset
+        {
+            get { return (double)GetValue(HorizontalOffsetProperty); }
+            set { SetValue(HorizontalOffsetProperty, value); }
         }
 
         public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register("IsOpen", typeof(bool), typeof(AdornerPopupDefinition), new FrameworkPropertyMetadata(false, IsOpenPropertyChanged));
@@ -82,8 +110,8 @@ namespace TestWPF
             }
         }
 
-        private PopupAdornern _popupAdorner;
-        public PopupAdornern PopupAdorner
+        private AdornerPopup _popupAdorner;
+        public AdornerPopup PopupAdorner
         {
             get { return _popupAdorner; }
         }
@@ -94,7 +122,18 @@ namespace TestWPF
 
             _popupAdorner.Child = null;
 
-            BindingOperations.ClearBinding(_popupAdorner, PopupAdornern.PlacementModeProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.PlacementModeProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.CenterOnPlacementTargetProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.UseDynamicPlacementProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.KeepWithinViewProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.VerticalOffsetProperty);
+            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.HorizontalOffsetProperty);
+            BindingOperations.ClearBinding(_popupAdorner, WidthProperty);
+            BindingOperations.ClearBinding(_popupAdorner, MinWidthProperty);
+            BindingOperations.ClearBinding(_popupAdorner, MaxWidthProperty);
+            BindingOperations.ClearBinding(_popupAdorner, HeightProperty);
+            BindingOperations.ClearBinding(_popupAdorner, MinHeightProperty);
+            BindingOperations.ClearBinding(_popupAdorner, MaxHeightProperty);
 
             _popupAdorner = null;
         }
@@ -107,9 +146,20 @@ namespace TestWPF
                 return;
             }
 
-            _popupAdorner = new PopupAdornern(PlacementTarget);
+            _popupAdorner = new AdornerPopup(PlacementTarget);
 
-            _popupAdorner.SetBinding(PopupAdornern.PlacementModeProperty, new Binding(nameof(PlacementMode)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.PlacementModeProperty, new Binding(nameof(PlacementMode)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.CenterOnPlacementTargetProperty, new Binding(nameof(CenterOnPlacementTarget)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.UseDynamicPlacementProperty, new Binding(nameof(UseDynamicPlacement)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.KeepWithinViewProperty, new Binding(nameof(KeepWithinViewport)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.VerticalOffsetProperty, new Binding(nameof(VerticalOffset)) { Source = this });
+            _popupAdorner.SetBinding(AdornerPopup.HorizontalOffsetProperty, new Binding(nameof(HorizontalOffset)) { Source = this });
+            _popupAdorner.SetBinding(WidthProperty, new Binding(nameof(Width)) { Source = this });
+            _popupAdorner.SetBinding(MinWidthProperty, new Binding(nameof(MinWidth)) { Source = this });
+            _popupAdorner.SetBinding(MaxWidthProperty, new Binding(nameof(MaxWidth)) { Source = this });
+            _popupAdorner.SetBinding(HeightProperty, new Binding(nameof(Height)) { Source = this });
+            _popupAdorner.SetBinding(MinHeightProperty, new Binding(nameof(MinHeight)) { Source = this });
+            _popupAdorner.SetBinding(MaxHeightProperty, new Binding(nameof(Height)) { Source = this });
 
             UpdatePopupChild();
 
@@ -123,26 +173,45 @@ namespace TestWPF
 
         protected virtual void OnIsOpenChanged()
         {
-            if (PopupAdorner == null) return;
-
-            if (PlacementTarget == null) return;
-
             UpdatePopupVisibility();
         }
 
         protected void UpdatePopupChild()
         {
-            if (PopupAdorner == null) return;
+            if (_popupAdorner == null) return;
 
-            PopupAdorner.Child = Child;
+            _popupAdorner.Child = Child;
         }
 
         protected void UpdatePopupVisibility()
         {
-            var adornerLayer = AdornerLayer.GetAdornerLayer(PlacementTarget);
+            if (_popupAdorner == null) return;
 
-            if (IsOpen) adornerLayer.Add(PopupAdorner);
-            else adornerLayer.Remove(PopupAdorner);
+            if (PlacementTarget == null) return;
+
+            var placementTarget = PlacementTarget;
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
+
+            if (IsOpen)
+            {
+                var placementTargetAdorners = adornerLayer.GetAdorners(placementTarget);
+
+                if (placementTargetAdorners != null && placementTargetAdorners.Contains(_popupAdorner)) return;
+
+                adornerLayer.Add(_popupAdorner);
+            }
+            else adornerLayer.Remove(_popupAdorner);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return new Size();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return new Size();
         }
     }
 }
