@@ -11,6 +11,11 @@ namespace TestWPF
 {
     public class Balloon : Decorator
     {
+        static Balloon()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Balloon), new FrameworkPropertyMetadata(typeof(Balloon)));
+        }
+
         private struct GeometryCash
         {
             public Thickness BorderThickness;
@@ -223,10 +228,10 @@ namespace TestWPF
             {
                 var firstAngleOffset = borderThickness.Left * (1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
-                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBalloonOffset1 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
+                var thirdAngleOffset = borderThickness.Top * (1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2));
 
-                var balloonStartPoint = new Point(topLeft.X, topLeft.Y - borderThickness.Top + diagonalBalloonWidth - firstAngleOffset);
-                var balloonEndPoint = new Point(topLeft.X - borderThickness.Left + diagonalBalloonWidth - thirdAngleOffset, topLeft.Y);
+                var balloonStartPoint = new Point(topLeft.X, Math.Max(topLeft.Y - borderThickness.Top + diagonalBalloonWidth - firstAngleOffset, topLeft.Y));
+                var balloonEndPoint = new Point(Math.Max(topLeft.X - borderThickness.Left + diagonalBalloonWidth - thirdAngleOffset, topLeft.X), topLeft.Y);
 
                 geometryContext.LineTo(balloonStartPoint, true, false);
 

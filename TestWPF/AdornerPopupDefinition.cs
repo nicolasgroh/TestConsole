@@ -24,11 +24,11 @@ namespace TestWPF
 
             if (e.OldValue is UIElement oldValue)
             {
-                if (instance._popupAdorner != null)
+                if (instance._adornerPopup != null)
                 {
                     var adornerLayer = AdornerLayer.GetAdornerLayer(oldValue);
 
-                    if (adornerLayer != null) adornerLayer.Remove(instance._popupAdorner);
+                    if (adornerLayer != null) adornerLayer.Remove(instance._adornerPopup);
                 }
             }
 
@@ -110,32 +110,32 @@ namespace TestWPF
             }
         }
 
-        private AdornerPopup _popupAdorner;
-        public AdornerPopup PopupAdorner
+        private AdornerPopup _adornerPopup;
+        public AdornerPopup AdornerPopup
         {
-            get { return _popupAdorner; }
+            get { return _adornerPopup; }
         }
 
         protected void ClearPopupAdorner()
         {
-            if (_popupAdorner == null) return;
+            if (_adornerPopup == null) return;
 
-            _popupAdorner.Child = null;
+            _adornerPopup.Child = null;
 
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.PlacementModeProperty);
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.CenterOnPlacementTargetProperty);
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.UseDynamicPlacementProperty);
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.KeepWithinViewProperty);
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.VerticalOffsetProperty);
-            BindingOperations.ClearBinding(_popupAdorner, AdornerPopup.HorizontalOffsetProperty);
-            BindingOperations.ClearBinding(_popupAdorner, WidthProperty);
-            BindingOperations.ClearBinding(_popupAdorner, MinWidthProperty);
-            BindingOperations.ClearBinding(_popupAdorner, MaxWidthProperty);
-            BindingOperations.ClearBinding(_popupAdorner, HeightProperty);
-            BindingOperations.ClearBinding(_popupAdorner, MinHeightProperty);
-            BindingOperations.ClearBinding(_popupAdorner, MaxHeightProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.PlacementModeProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.CenterOnPlacementTargetProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.UseDynamicPlacementProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.KeepWithinViewProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.VerticalOffsetProperty);
+            BindingOperations.ClearBinding(_adornerPopup, AdornerPopup.HorizontalOffsetProperty);
+            BindingOperations.ClearBinding(_adornerPopup, WidthProperty);
+            BindingOperations.ClearBinding(_adornerPopup, MinWidthProperty);
+            BindingOperations.ClearBinding(_adornerPopup, MaxWidthProperty);
+            BindingOperations.ClearBinding(_adornerPopup, HeightProperty);
+            BindingOperations.ClearBinding(_adornerPopup, MinHeightProperty);
+            BindingOperations.ClearBinding(_adornerPopup, MaxHeightProperty);
 
-            _popupAdorner = null;
+            _adornerPopup = null;
         }
 
         protected void CreatePopupAdorner()
@@ -146,20 +146,20 @@ namespace TestWPF
                 return;
             }
 
-            _popupAdorner = new AdornerPopup(PlacementTarget);
+            _adornerPopup = new AdornerPopup(PlacementTarget);
 
-            _popupAdorner.SetBinding(AdornerPopup.PlacementModeProperty, new Binding(nameof(PlacementMode)) { Source = this });
-            _popupAdorner.SetBinding(AdornerPopup.CenterOnPlacementTargetProperty, new Binding(nameof(CenterOnPlacementTarget)) { Source = this });
-            _popupAdorner.SetBinding(AdornerPopup.UseDynamicPlacementProperty, new Binding(nameof(UseDynamicPlacement)) { Source = this });
-            _popupAdorner.SetBinding(AdornerPopup.KeepWithinViewProperty, new Binding(nameof(KeepWithinViewport)) { Source = this });
-            _popupAdorner.SetBinding(AdornerPopup.VerticalOffsetProperty, new Binding(nameof(VerticalOffset)) { Source = this });
-            _popupAdorner.SetBinding(AdornerPopup.HorizontalOffsetProperty, new Binding(nameof(HorizontalOffset)) { Source = this });
-            _popupAdorner.SetBinding(WidthProperty, new Binding(nameof(Width)) { Source = this });
-            _popupAdorner.SetBinding(MinWidthProperty, new Binding(nameof(MinWidth)) { Source = this });
-            _popupAdorner.SetBinding(MaxWidthProperty, new Binding(nameof(MaxWidth)) { Source = this });
-            _popupAdorner.SetBinding(HeightProperty, new Binding(nameof(Height)) { Source = this });
-            _popupAdorner.SetBinding(MinHeightProperty, new Binding(nameof(MinHeight)) { Source = this });
-            _popupAdorner.SetBinding(MaxHeightProperty, new Binding(nameof(Height)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.PlacementModeProperty, new Binding(nameof(PlacementMode)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.CenterOnPlacementTargetProperty, new Binding(nameof(CenterOnPlacementTarget)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.UseDynamicPlacementProperty, new Binding(nameof(UseDynamicPlacement)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.KeepWithinViewProperty, new Binding(nameof(KeepWithinViewport)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.VerticalOffsetProperty, new Binding(nameof(VerticalOffset)) { Source = this });
+            _adornerPopup.SetBinding(AdornerPopup.HorizontalOffsetProperty, new Binding(nameof(HorizontalOffset)) { Source = this });
+            _adornerPopup.SetBinding(WidthProperty, new Binding(nameof(Width)) { Source = this });
+            _adornerPopup.SetBinding(MinWidthProperty, new Binding(nameof(MinWidth)) { Source = this });
+            _adornerPopup.SetBinding(MaxWidthProperty, new Binding(nameof(MaxWidth)) { Source = this });
+            _adornerPopup.SetBinding(HeightProperty, new Binding(nameof(Height)) { Source = this });
+            _adornerPopup.SetBinding(MinHeightProperty, new Binding(nameof(MinHeight)) { Source = this });
+            _adornerPopup.SetBinding(MaxHeightProperty, new Binding(nameof(Height)) { Source = this });
 
             UpdatePopupChild();
 
@@ -178,18 +178,18 @@ namespace TestWPF
 
         protected void UpdatePopupChild()
         {
-            if (_popupAdorner == null) return;
+            if (_adornerPopup == null) return;
 
-            _popupAdorner.Child = Child;
+            _adornerPopup.Child = Child;
         }
 
         protected void UpdatePopupVisibility()
         {
-            if (_popupAdorner == null) return;
-
-            if (PlacementTarget == null) return;
+            if (_adornerPopup == null) return;
 
             var placementTarget = PlacementTarget;
+
+            if (placementTarget == null) return;
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
 
@@ -197,11 +197,11 @@ namespace TestWPF
             {
                 var placementTargetAdorners = adornerLayer.GetAdorners(placementTarget);
 
-                if (placementTargetAdorners != null && placementTargetAdorners.Contains(_popupAdorner)) return;
+                if (placementTargetAdorners != null && placementTargetAdorners.Contains(_adornerPopup)) return;
 
-                adornerLayer.Add(_popupAdorner);
+                adornerLayer.Add(_adornerPopup);
             }
-            else adornerLayer.Remove(_popupAdorner);
+            else adornerLayer.Remove(_adornerPopup);
         }
 
         protected override Size MeasureOverride(Size availableSize)

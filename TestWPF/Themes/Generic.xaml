@@ -335,4 +335,12 @@
 
     <Style TargetType="{x:Type local:AdornerPopup}">
     </Style>
+
+    <Style TargetType="{x:Type local:Balloon}">
+        <Setter Property="Background" Value="#6E3164"/>
+        <Setter Property="TextElement.Foreground" Value="White"/>
+        <Setter Property="CornerRadius" Value="3"/>
+        <Setter Property="BalloonWidth" Value="10"/>
+        <Setter Property="BalloonLenght" Value="10"/>
+    </Style>
 </ResourceDictionary>
