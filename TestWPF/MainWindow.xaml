@@ -29,7 +29,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--<Button Content="Test" Height="25" Click="Test_Click"/>-->
+        <Button Content="Test" Height="25" Click="Test_Click"/>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
                 <local:FlexCustomItemsControl.ItemContainerStyle>
@@ -66,18 +66,21 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="False" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
-            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
-                <ContentPresenter Content="Es muss eine Partner-Nr. angegeben werden" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </local:Balloon>
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+            
+                <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" BalloonLenght="15" CornerRadius="14.5" Background="#FFCFFFCC" BorderBrush="#FF0FC300" BorderThickness="1" TextElement.Foreground="#FF0FC300" TextElement.FontSize="12">
+                    <ContentPresenter Content="Erfolgreich!" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </local:Balloon>
         </local:AdornerPopupDefinition>
 
-        <Canvas Grid.Row="1">
-            <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta"/>
+        <AdornerDecorator Grid.Row="1">
+            <Canvas Grid.Row="1" x:Name="TestCanvas">
+                <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta"/>
 
-            <local:Balloon BalloonDirection="TopLeft" Background="Transparent" BorderThickness="1 2" BorderBrush="Black" Height="80" Width="140" BalloonLenght="20">
-                <ContentPresenter Content="Es muss eine Partner-Nr. angegeben werden" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </local:Balloon>
-        </Canvas>
+                <local:Balloon BalloonDirection="BottomLeft" BalloonLenght="20">
+                    <ContentPresenter Content="Es muss eine Partner-Nr. angegeben werden" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </local:Balloon>
+            </Canvas>
+        </AdornerDecorator>
     </Grid>
 </Window>

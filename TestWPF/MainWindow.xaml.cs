@@ -12,6 +12,8 @@ using System.Windows.Interop;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
+using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace TestWPF
 {
@@ -127,9 +129,60 @@ namespace TestWPF
 
         }
 
+        int _testClickCount = 0;
+
         private void Test_Click(object sender, RoutedEventArgs e)
         {
+            var firstLineFirstPoint = new Point(10, 12);
+            var firstLineSecondPoint = new Point(60, 50);
             
+            var secondLineFirstPoint = new Point(20, 42);
+            var secondLineSecondPoint = new Point(36, 16);
+
+            if (_testClickCount == 0)
+            {
+                var firstPath = new Path()
+                {
+                    Stroke = Brushes.Black
+                };
+
+                firstPath.Data = new LineGeometry(firstLineFirstPoint, firstLineSecondPoint);
+
+                TestCanvas.Children.Add(firstPath);
+
+                var secondPath = new Path()
+                {
+                    Stroke = Brushes.Black
+                };
+
+                secondPath.Data = new LineGeometry(secondLineFirstPoint, secondLineSecondPoint);
+
+                TestCanvas.Children.Add(secondPath);
+            }
+            else if ( _testClickCount == 1)
+            {
+                var point = new Point();
+
+                var firstMagicMultiplicationValue = firstLineFirstPoint.X * firstLineSecondPoint.Y - firstLineFirstPoint.Y * firstLineSecondPoint.X;
+                var secondMagicMultiplicationValue = secondLineSecondPoint.X * secondLineFirstPoint.Y - secondLineSecondPoint.Y * secondLineFirstPoint.X;
+
+                var magicDvisionValue = (firstLineFirstPoint.X - firstLineSecondPoint.X) * (secondLineSecondPoint.Y - secondLineFirstPoint.Y) - (firstLineFirstPoint.Y - firstLineSecondPoint.Y) * (secondLineSecondPoint.X - secondLineFirstPoint.X);
+
+                point.X = ((secondLineSecondPoint.X - secondLineFirstPoint.X) * firstMagicMultiplicationValue - (firstLineFirstPoint.X - firstLineSecondPoint.X) * secondMagicMultiplicationValue) / magicDvisionValue;
+
+                point.Y = ((secondLineSecondPoint.Y - secondLineFirstPoint.Y) * firstMagicMultiplicationValue - (firstLineFirstPoint.Y - firstLineSecondPoint.Y) * secondMagicMultiplicationValue) / magicDvisionValue;
+
+                var thirdPath = new Path()
+                {
+                    Fill = Brushes.Red
+                };
+
+                thirdPath.Data = new EllipseGeometry(point, 3, 3);
+
+                TestCanvas.Children.Add(thirdPath);
+            }
+
+            _testClickCount++;
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
@@ -148,9 +201,7 @@ namespace TestWPF
 
         private void RootBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var border = (Border)sender;
-
-            //TestAdornerPopupDefinition.PlacementTarget = border;
+            
         }
     }
 }

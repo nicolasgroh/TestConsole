@@ -337,10 +337,12 @@
     </Style>
 
     <Style TargetType="{x:Type local:Balloon}">
-        <Setter Property="Background" Value="#6E3164"/>
-        <Setter Property="TextElement.Foreground" Value="White"/>
-        <Setter Property="CornerRadius" Value="3"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="TextElement.Foreground" Value="Black"/>
+        <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BalloonWidth" Value="10"/>
         <Setter Property="BalloonLenght" Value="10"/>
+        <Setter Property="BorderThickness" Value="3"/>
+        <Setter Property="BorderBrush" Value="#6E3164"/>
     </Style>
 </ResourceDictionary>
