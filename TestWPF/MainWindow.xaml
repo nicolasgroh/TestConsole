@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         WindowStyle="None"
         Title="MainWindow"
-        d:DesignHeight="400"
+        d:DesignHeight="800"
         Width="800">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo>
@@ -67,19 +67,14 @@
             </local:FlexCustomItemsControl>-->
 
         <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
-            
-                <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" BalloonLenght="15" CornerRadius="14.5" Background="#FFCFFFCC" BorderBrush="#FF0FC300" BorderThickness="1" TextElement.Foreground="#FF0FC300" TextElement.FontSize="12">
-                    <ContentPresenter Content="Erfolgreich!" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </local:Balloon>
+            <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
+            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" BalloonLenght="15" BalloonWidth="15" CornerRadius="8" Background="#FFCFFFCC" BorderBrush="#FF0FC300" BorderThickness="1">
+                <TextBlock Text="Erfolgreich" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Foreground="#FF0FC300"/>
+            </local:Balloon>
         </local:AdornerPopupDefinition>
-
         <AdornerDecorator Grid.Row="1">
             <Canvas Grid.Row="1" x:Name="TestCanvas">
-                <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta"/>
-
-                <local:Balloon BalloonDirection="BottomLeft" BalloonLenght="20">
-                    <ContentPresenter Content="Es muss eine Partner-Nr. angegeben werden" Margin="10 5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </local:Balloon>
+                <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="50"/>
             </Canvas>
         </AdornerDecorator>
     </Grid>
