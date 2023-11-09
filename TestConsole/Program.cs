@@ -16,7 +16,7 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            
+            CSVPrettifier();
         }
 
         #region Gimeg SalesOrder Parsen

@@ -20,9 +20,19 @@ namespace TestWPF
 
         public AdornerPopup(UIElement adornedElement) : base(adornedElement)
         {
-
+            LayoutUpdated += AdornerPopup_LayoutUpdated;
         }
 
+        private void AdornerPopup_LayoutUpdated(object sender, EventArgs e)
+        {
+            _firstAfterLayoutUpdated = true;
+            _lastFitted = false;
+            _fittedTwice = false;
+
+            _failedPlacementModes.Clear();
+        }
+
+        #region DependancyProperties
         public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public AdornerPopupPlacementMode PlacementMode
         {
@@ -71,48 +81,124 @@ namespace TestWPF
             get { return (double)GetValue(HorizontalOffsetProperty); }
             set { SetValue(HorizontalOffsetProperty, value); }
         }
+        #endregion
 
         private TransformInfo _transformInfo;
 
-        public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
+        private bool _firstAfterLayoutUpdated = true;
+
+        private bool _lastFitted = false;
+        private bool _fittedTwice = false;
+
+        private HashSet<AdornerPopupPlacementMode> _failedPlacementModes = new HashSet<AdornerPopupPlacementMode>(8);
+
+        private bool TryCreateTransformInfo(Size contentSize)
         {
             _transformInfo = default;
 
+            var adornerLayer = AdornerLayer.GetAdornerLayer(AdornedElement);
+
+            var adornerLayerParent = VisualTreeHelper.GetParent(adornerLayer) as Visual;
+
+            if (adornerLayerParent == null)
+            {
+                _offsetX = 0;
+                _offsetY = 0;
+                return false;
+            }
+
+            var transform = AdornedElement.TransformToAncestor(adornerLayerParent);
+
+            var origin = transform.Transform(default);
+
+            Size adornedElementSize;
+
+            if (AdornedElement is FrameworkElement frameworkElement) adornedElementSize = new Size(frameworkElement.ActualWidth, frameworkElement.ActualHeight);
+            else adornedElementSize = AdornedElement.RenderSize;
+
+            _transformInfo = new TransformInfo
+            {
+                Constraint = new Size(adornerLayer.ActualWidth, adornerLayer.ActualHeight),
+                Origin = origin,
+                ContentSize = contentSize,
+                AdornedElementSize = adornedElementSize,
+                CenterOnPlacementTarget = CenterOnPlacementTarget
+            };
+
+            return true;
+        }
+
+        protected override Size ArrangeOverride(Size arrangeSize)
+        {
+            var baseArrangeSize = base.ArrangeOverride(arrangeSize);
+
+            if (Child == null) return baseArrangeSize;
+
+            if (_firstAfterLayoutUpdated) ComputedPlacementMode = AdornerPopupPlacementMode.Relative;
+            else
+            {
+                if (!_lastFitted)
+                {
+                    _failedPlacementModes.Add(ComputedPlacementMode);
+                }
+            }
+
+            if (!TryCreateTransformInfo(baseArrangeSize)) return baseArrangeSize;
+
+            CalculateOffset(PlacementMode, out var computedPlacementMode, out double offsetX, out double offsetY);
+
+            offsetX += HorizontalOffset;
+            offsetY += VerticalOffset;
+
+            if (!_fittedTwice)
+            {
+                _lastFitted = FitsInAdornerLayer(offsetX, offsetY);
+
+                if (_lastFitted && computedPlacementMode == ComputedPlacementMode)
+                {
+                    _fittedTwice = true;
+
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(AdornedElement);
+
+                    adornerLayer?.Update(AdornedElement);
+                }
+                else
+                {
+                    Child.InvalidateMeasure();
+
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(AdornedElement);
+
+                    adornerLayer?.Update(AdornedElement);
+                }
+            }
+
+            if (KeepWithinView)
+            {
+                offsetX = Math.Max(Math.Min(offsetX, _transformInfo.Constraint.Width - _transformInfo.ContentSize.Width), 0);
+                offsetY = Math.Max(Math.Min(offsetY, _transformInfo.Constraint.Height - _transformInfo.ContentSize.Height), 0);
+            }
+
+            _offsetX = offsetX;
+            _offsetY = offsetY;
+
+            ComputedPlacementMode = computedPlacementMode;
+
+            _firstAfterLayoutUpdated = false;
+
+            return baseArrangeSize;
+        }
+
+        private double _offsetX = 0;
+        private double _offsetY = 0;
+
+        public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
+        {
             if (generalTransform is Transform transform)
             {
                 var matrix = transform.Value;
 
-                var adornerLayer = AdornerLayer.GetAdornerLayer(AdornedElement);
-
-                Size adornedElementSize;
-
-                if (AdornedElement is FrameworkElement frameworkElement) adornedElementSize = new Size(frameworkElement.ActualWidth, frameworkElement.ActualHeight);
-                else adornedElementSize = AdornedElement.RenderSize;
-
-                _transformInfo = new TransformInfo
-                {
-                    Constraint = new Size(adornerLayer.ActualWidth, adornerLayer.ActualHeight),
-                    Origin = new Point(matrix.OffsetX, matrix.OffsetY),
-                    ContentSize = new Size(ActualWidth, ActualHeight),
-                    AdornedElementSize = adornedElementSize,
-                    CenterOnPlacementTarget = CenterOnPlacementTarget
-                };
-
-                CalculateOffset(PlacementMode, out AdornerPopupPlacementMode computedPlacementMode, out double offsetX, out double offsetY);
-
-                ComputedPlacementMode = computedPlacementMode;
-
-                offsetX += HorizontalOffset;
-                offsetY += VerticalOffset;
-
-                if (KeepWithinView)
-                {
-                    offsetX = Math.Max(Math.Min(offsetX, _transformInfo.Constraint.Width - _transformInfo.ContentSize.Width), 0);
-                    offsetY = Math.Max(Math.Min(offsetY, _transformInfo.Constraint.Height - _transformInfo.ContentSize.Height), 0);
-                }
-
-                matrix.OffsetX = offsetX;
-                matrix.OffsetY = offsetY;
+                matrix.OffsetX = _offsetX;
+                matrix.OffsetY = _offsetY;
 
                 return new MatrixTransform(matrix);
             }
@@ -199,7 +285,7 @@ namespace TestWPF
 
         private AdornerPopupPlacementMode? _lastFittingPlacementMode = null;
 
-        private bool GetAlternativePlacementMode(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode alternativePlacementMode, out double offsetX, out double offsetY)
+        private bool GetNextPlacementMode(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode alternativePlacementMode, out double offsetX, out double offsetY)
         {
             offsetX = _transformInfo.Origin.X;
             offsetY = _transformInfo.Origin.Y;
@@ -288,21 +374,14 @@ namespace TestWPF
             {
                 var placement = tryOrder[i];
 
-                CalculatePlacementModeOffset(placement, out offsetX, out offsetY);
-
-                if (FitsInAdornerLayer(offsetX, offsetY))
+                if (!_failedPlacementModes.Contains(placement))
                 {
-                    _lastFittingPlacementMode = placement;
-
                     alternativePlacementMode = placement;
+
+                    CalculatePlacementModeOffset(placement, out offsetX, out offsetY);
+
                     return true;
                 }
-            }
-
-            if (_lastFittingPlacementMode != null)
-            {
-                CalculatePlacementModeOffset(_lastFittingPlacementMode.Value, out offsetX, out offsetY);
-                alternativePlacementMode = _lastFittingPlacementMode.Value;
             }
 
             return false;
@@ -310,19 +389,15 @@ namespace TestWPF
 
         protected virtual void CalculateOffset(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode computedPlacementMode, out double offsetX, out double offsetY)
         {
-            computedPlacementMode = placementMode;
-
-            CalculatePlacementModeOffset(placementMode, out offsetX, out offsetY);
-
-            if (FitsInAdornerLayer(offsetX, offsetY))
+            if (_failedPlacementModes.Contains(placementMode) && UseDynamicPlacement)
             {
-                _lastFittingPlacementMode = placementMode;
-                return;
+                GetNextPlacementMode(placementMode, out computedPlacementMode, out offsetX, out offsetY);
             }
-
-            if (UseDynamicPlacement)
+            else
             {
-                GetAlternativePlacementMode(placementMode, out computedPlacementMode, out offsetX, out offsetY);
+                computedPlacementMode = placementMode;
+
+                CalculatePlacementModeOffset(placementMode, out offsetX, out offsetY);
             }
         }
 
