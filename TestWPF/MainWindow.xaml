@@ -10,13 +10,6 @@
         Title="MainWindow"
         d:DesignHeight="800"
         Width="800">
-    <Window.TaskbarItemInfo>
-        <TaskbarItemInfo>
-            <TaskbarItemInfo.ThumbButtonInfos>
-                <ThumbButtonInfo Click="ThumnButton_Click"/>
-            </TaskbarItemInfo.ThumbButtonInfos>
-        </TaskbarItemInfo>
-    </Window.TaskbarItemInfo>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="10" GlassFrameThickness="10"/>
     </WindowChrome.WindowChrome>
@@ -66,10 +59,10 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="False" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" BalloonLenght="15" BalloonWidth="15" CornerRadius="8" Background="#FFCFFFCC" BorderBrush="#FF0FC300" BorderThickness="1">
-                <TextBlock Text="Erfolgreich" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Foreground="#FF0FC300"/>
+            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" CornerRadius="8" Background="#FFFFD6D6" BorderBrush="Red" BorderThickness="1">
+                <TextBlock Text="Ein Fehler ist aufgetreten" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Foreground="Red"/>
             </local:Balloon>
         </local:AdornerPopupDefinition>
         <AdornerDecorator Grid.Row="1">

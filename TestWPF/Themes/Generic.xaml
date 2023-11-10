@@ -340,9 +340,32 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="TextElement.Foreground" Value="Black"/>
         <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="BalloonWidth" Value="10"/>
+        <Setter Property="BalloonWidth" Value="15"/>
         <Setter Property="BalloonLenght" Value="10"/>
-        <Setter Property="BorderThickness" Value="3"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="#6E3164"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="2"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="BalloonDirection" Value="TopLeft">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="TopRight">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="BottomRight">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="BottomLeft">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

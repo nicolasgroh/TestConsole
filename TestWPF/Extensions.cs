@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace TestWPF
 {
@@ -30,6 +34,44 @@ namespace TestWPF
             double eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * DBL_EPSILON;
             double delta = value1 - value2;
             return (-eps < delta) && (eps > delta);
+        }
+
+        public static void ShowBalloonTip(this UIElement element, string text)
+        {
+            Balloon balloon;
+
+            var adornerPopup = new AdornerPopup(element)
+            {
+                PlacementMode = AdornerPopupPlacementMode.Top,
+                Child = balloon = new Balloon()
+                {
+                    Child = new TextBlock()
+                    {
+                        Text = text,
+                        Margin = new Thickness(5, 2, 5, 2)
+                    }
+                }
+            };
+
+            balloon.SetBinding(Balloon.BalloonDirectionProperty, new Binding("PlacementMode") { Source = adornerPopup, Converter = new PopupPlacementToBalloonDirectionConverter() });
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+
+            var timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+
+            timer.Tick += (s, e) =>
+            {
+                timer.Stop();
+
+                adornerLayer?.Remove(adornerPopup);
+            };
+
+            adornerLayer?.Add(adornerPopup);
+
+            timer.Start();
         }
     }
 }
