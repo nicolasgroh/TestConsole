@@ -337,18 +337,13 @@
     </Style>
 
     <Style TargetType="{x:Type local:Balloon}">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="TextElement.Foreground" Value="Black"/>
+        <Setter Property="Background" Value="#6E3164"/>
+        <Setter Property="TextElement.Foreground" Value="White"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BalloonWidth" Value="15"/>
         <Setter Property="BalloonLenght" Value="10"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#6E3164"/>
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect ShadowDepth="2"/>
-            </Setter.Value>
-        </Setter>
         <Style.Triggers>
             <Trigger Property="BalloonDirection" Value="TopLeft">
                 <Setter Property="BalloonWidth" Value="10"/>
@@ -368,4 +363,40 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="{x:Type local:Balloon}" x:Key="AsanaBalloonStyle">
+        <Setter Property="Background" Value="#424244"/>
+        <Setter Property="TextElement.Foreground" Value="#dddcdb"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="BalloonWidth" Value="15"/>
+        <Setter Property="BalloonLenght" Value="8"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="BalloonDirection" Value="TopLeft">
+                
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="TopRight">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="BottomRight">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+            <Trigger Property="BalloonDirection" Value="BottomLeft">
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <SetterBaseCollection x:Key="TestSetterCollection">
+        <Setter Property="BalloonWidth" Value="10"/>
+        <Setter Property="BalloonLenght" Value="15"/>
+    </SetterBaseCollection>
+    
+    <TriggerActionCollection x:Key="TestTriggerCollection">
+        
+    </TriggerActionCollection>
 </ResourceDictionary>

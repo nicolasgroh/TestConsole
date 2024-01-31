@@ -59,10 +59,10 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="False" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="False">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}" CornerRadius="8" Background="#FFFFD6D6" BorderBrush="Red" BorderThickness="1">
-                <TextBlock Text="Ein Fehler ist aufgetreten" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Foreground="Red"/>
+            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
+                <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
             </local:Balloon>
         </local:AdornerPopupDefinition>
         <AdornerDecorator Grid.Row="1">

@@ -23,13 +23,13 @@ namespace TestWPF
         protected override Panel CreateItemsHost()
         {
             if (_itemsHost != null) _itemsHost.ItemsPerRowChanged -= ItemsHost_ItemsPerRowChanged;
-
+            
             _itemsHost = new FlexPanel();
 
             _itemsHost.SetBinding(FlexPanel.MinItemWidthProperty, new Binding() { Source = this, Path = new PropertyPath(MinItemWidthProperty) });
 
             _itemsHost.ItemsPerRowChanged += ItemsHost_ItemsPerRowChanged;
-
+            
             return _itemsHost;
         }
 
