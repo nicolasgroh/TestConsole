@@ -81,6 +81,8 @@ namespace TestWPF
                     {
                         var child = children[i];
 
+                        if (child == null) continue;
+
                         child.Measure(new Size(width, availableSize.Height));
                     }
                 }
@@ -95,9 +97,12 @@ namespace TestWPF
                     {
                         var child = children[i];
 
-                        child.Measure(new Size(autoWidthColumn.MaxWidth, availableSize.Height));
+                        if (child != null)
+                        {
+                            child.Measure(new Size(autoWidthColumn.MaxWidth, availableSize.Height));
 
-                        if (child.DesiredSize.Width > width) width = child.DesiredSize.Width;
+                            if (child.DesiredSize.Width > width) width = child.DesiredSize.Width;
+                        }
                     }
 
                     CoerceColumnWidth(autoWidthColumn, ref width);
@@ -137,6 +142,8 @@ namespace TestWPF
                     {
                         var child = children[i];
 
+                        if (child == null) continue;
+
                         child.Measure(new Size(width, availableSize.Height));
                     }
                 }
@@ -152,27 +159,29 @@ namespace TestWPF
 
                     var columnWidth = _columnWidths[finalColumnIndex];
 
-                    double childHeight;
-
-                    if (child.IsMeasureValid) childHeight = child.DesiredSize.Height;
-                    else
+                    if (child != null)
                     {
-                        child.Measure(new Size(columnWidth, availableSize.Height));
+                        double childHeight;
 
-                        childHeight = child.DesiredSize.Height;
+                        if (child.IsMeasureValid) childHeight = child.DesiredSize.Height;
+                        else
+                        {
+                            child.Measure(new Size(columnWidth, availableSize.Height));
+
+                            childHeight = child.DesiredSize.Height;
+                        }
+
+                        if (childHeight > rowHeight) rowHeight = childHeight;
                     }
-
-                    if (childHeight > rowHeight) rowHeight = childHeight;
 
                     finalColumnIndex++;
 
-                    if (finalColumnIndex == columnDefinitions.Count)
+                    if (finalColumnIndex == columnDefinitions.Count || i == children.Count - 1)
                     {
                         height += rowHeight;
                         finalColumnIndex = 0;
                         rowHeight = 0.0;
                     }
-                    else if (i == children.Count - 1) height += rowHeight;
                 }
 
                 return new Size(availableSize.Width, height);
@@ -190,6 +199,8 @@ namespace TestWPF
                 for (int i = 0; i < children.Count; i++)
                 {
                     var child = children[i];
+
+                    if (child == null) continue;
 
                     child.Arrange(new Rect(finalSize));
                 }
@@ -211,11 +222,12 @@ namespace TestWPF
 
                     columnIndex++;
 
-                    if (columnIndex == _columnWidths.Length)
+                    if (columnIndex == _columnWidths.Length || i == children.Count - 1)
                     {
                         rowStart += ArrangeRow(rowChildren, rowStart);
 
                         columnIndex = 0;
+                        rowChildren = new UIElement[_columnWidths.Length];
                     }
                 }
 
@@ -225,7 +237,7 @@ namespace TestWPF
 
         private double ArrangeRow(UIElement[] children, double rowStart)
         {
-            var rowHeight = children.Max(x => x.DesiredSize.Height);
+            var rowHeight = children.Where(x => x != null).Max(x => x.DesiredSize.Height);
 
             var columnStart = 0.0;
 
@@ -237,7 +249,11 @@ namespace TestWPF
 
                 var child = children[i];
 
+                if (child == null) continue;
+
                 child.Arrange(new Rect(new Point(columnStart, rowStart), new Size(columnWidth, rowHeight)));
+
+                columnStart += columnWidth;
             }
 
             return rowHeight;

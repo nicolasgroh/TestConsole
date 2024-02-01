@@ -24,13 +24,21 @@
 
         <Button Content="Test" Height="25" Click="Test_Click"/>
 
-        <local:TablePanel Grid.Row="1">
+        <local:TablePanel Grid.Row="1" VerticalAlignment="Top">
             <local:TablePanel.ColumnDefinitions>
                 <local:TableColumnDefinition Width="Auto"/>
+                <local:TableColumnDefinition Width="100"/>
                 <local:TableColumnDefinition Width="*"/>
+                <local:TableColumnDefinition Width="Auto"/>
             </local:TablePanel.ColumnDefinitions>
 
             <Button Content="Test"/>
+            <Button Content="Test2"/>
+            <Button Content="Test3"/>
+            <Button Content="Test4"/>
+            <Button Content="Test5"/>
+            <Button Content="Test6"/>
+            <Button Content="Test7"/>
         </local:TablePanel>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
