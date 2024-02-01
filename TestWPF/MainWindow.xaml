@@ -24,6 +24,15 @@
 
         <Button Content="Test" Height="25" Click="Test_Click"/>
 
+        <local:TablePanel Grid.Row="1">
+            <local:TablePanel.ColumnDefinitions>
+                <local:TableColumnDefinition Width="Auto"/>
+                <local:TableColumnDefinition Width="*"/>
+            </local:TablePanel.ColumnDefinitions>
+
+            <Button Content="Test"/>
+        </local:TablePanel>
+
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
                 <local:FlexCustomItemsControl.ItemContainerStyle>
                     <Style TargetType="{x:Type ContentControl}">

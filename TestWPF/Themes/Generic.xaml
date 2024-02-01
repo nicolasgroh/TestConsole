@@ -390,13 +390,4 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-    <SetterBaseCollection x:Key="TestSetterCollection">
-        <Setter Property="BalloonWidth" Value="10"/>
-        <Setter Property="BalloonLenght" Value="15"/>
-    </SetterBaseCollection>
-    
-    <TriggerActionCollection x:Key="TestTriggerCollection">
-        
-    </TriggerActionCollection>
 </ResourceDictionary>

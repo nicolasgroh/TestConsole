@@ -15,7 +15,7 @@ namespace TestWPF
         {
             var columnDefinition = (TableColumnDefinition)d;
 
-            columnDefinition.LayoutPropertyChanged.Invoke(columnDefinition, WidthProperty);
+            columnDefinition.LayoutPropertyChanged?.Invoke(columnDefinition, WidthProperty);
         }
 
         public GridLength Width
@@ -30,7 +30,7 @@ namespace TestWPF
         {
             var columnDefinition = (TableColumnDefinition)d;
 
-            columnDefinition.LayoutPropertyChanged.Invoke(columnDefinition, MinWidthProperty);
+            columnDefinition.LayoutPropertyChanged?.Invoke(columnDefinition, MinWidthProperty);
         }
 
         public double MinWidth
@@ -45,7 +45,7 @@ namespace TestWPF
         {
             var columnDefinition = (TableColumnDefinition)d;
 
-            columnDefinition.LayoutPropertyChanged.Invoke(columnDefinition, MaxWidthProperty);
+            columnDefinition.LayoutPropertyChanged?.Invoke(columnDefinition, MaxWidthProperty);
         }
 
         public double MaxWidth
