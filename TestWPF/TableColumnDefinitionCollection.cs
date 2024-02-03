@@ -22,19 +22,19 @@ namespace TestWPF
             _owner.InvalidateMeasure();
         }
 
-        private void ColumnDefinitionLayoutPropertyChanged(TableColumnDefinition columnDefinition, DependencyProperty property)
+        private void ColumnDefinition_LayoutPropertyChanged(TableColumnDefinition columnDefinition, DependencyProperty property)
         {
             ResetMeasure();
         }
 
         private void HookupColumnDefinition(TableColumnDefinition columnDefinition)
         {
-            columnDefinition.LayoutPropertyChanged += ColumnDefinitionLayoutPropertyChanged;
+            columnDefinition.LayoutPropertyChanged += ColumnDefinition_LayoutPropertyChanged;
         }
 
         private void UnhookColumnDefinition(TableColumnDefinition columnDefinition)
         {
-            columnDefinition.LayoutPropertyChanged -= ColumnDefinitionLayoutPropertyChanged;
+            columnDefinition.LayoutPropertyChanged -= ColumnDefinition_LayoutPropertyChanged;
         }
 
         protected override void ClearItems()

@@ -21,15 +21,20 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+        </Grid.ColumnDefinitions>
 
         <Button Content="Test" Height="25" Click="Test_Click"/>
 
-        <local:TablePanel Grid.Row="1" VerticalAlignment="Top">
+        <local:TablePanel Grid.Row="1" VerticalAlignment="Top" HorizontalGap="10" VerticalGap="10">
             <local:TablePanel.ColumnDefinitions>
-                <local:TableColumnDefinition Width="Auto"/>
+                <local:TableColumnDefinition Width="Auto" MinWidth="120"/>
                 <local:TableColumnDefinition Width="100"/>
+                <local:TableColumnDefinition Width="*" MaxWidth="100"/>
                 <local:TableColumnDefinition Width="*"/>
-                <local:TableColumnDefinition Width="Auto"/>
+                <local:TableColumnDefinition Width="0.5*"/>
+                <local:TableColumnDefinition Width="Auto" MinWidth="50"/>
             </local:TablePanel.ColumnDefinitions>
 
             <Button Content="Test"/>
