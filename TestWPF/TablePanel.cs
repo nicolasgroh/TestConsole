@@ -203,7 +203,7 @@ namespace TestWPF
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (double.IsInfinity(availableSize.Width) || double.IsInfinity(availableSize.Height)) throw new InvalidOperationException("TablePanel does not support scrolling.");
+            if (double.IsInfinity(availableSize.Width)) throw new InvalidOperationException("TablePanel does not support horizontal scrolling.");
 
             var children = InternalChildren;
 
@@ -242,7 +242,7 @@ namespace TestWPF
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if (double.IsInfinity(finalSize.Width) || double.IsInfinity(finalSize.Height)) throw new InvalidOperationException("TablePanel does not support scrolling.");
+            if (double.IsInfinity(finalSize.Width)) throw new InvalidOperationException("TablePanel does not support horizontal scrolling.");
 
             var children = InternalChildren;
 
