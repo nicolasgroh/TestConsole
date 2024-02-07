@@ -32,8 +32,6 @@ namespace TestWPF
                 }
             }
 
-            instance.ClearPopupAdorner();
-            
             instance.OnPlacementTargetChanged();
         }
 
@@ -116,7 +114,12 @@ namespace TestWPF
             get { return _adornerPopup; }
         }
 
-        protected void ClearPopupAdorner()
+        protected virtual AdornerPopup CreateAdornerPopup(UIElement placementTarget)
+        {
+            return new AdornerPopup(placementTarget);
+        }
+
+        protected void ClearAdornerPopup()
         {
             if (_adornerPopup == null) return;
 
@@ -138,15 +141,13 @@ namespace TestWPF
             _adornerPopup = null;
         }
 
-        protected void CreatePopupAdorner()
+        protected void ResetAdornerPopup()
         {
-            if (PlacementTarget == null)
-            {
-                ClearPopupAdorner();
-                return;
-            }
+            ClearAdornerPopup();
 
-            _adornerPopup = new AdornerPopup(PlacementTarget);
+            _adornerPopup = CreateAdornerPopup(PlacementTarget);
+
+            if (_adornerPopup == null) throw new ArgumentNullException(nameof(_adornerPopup));
 
             _adornerPopup.SetBinding(AdornerPopup.PlacementModeProperty, new Binding(nameof(PlacementMode)) { Source = this });
             _adornerPopup.SetBinding(AdornerPopup.CenterOnPlacementTargetProperty, new Binding(nameof(CenterOnPlacementTarget)) { Source = this });
@@ -168,7 +169,7 @@ namespace TestWPF
 
         protected virtual void OnPlacementTargetChanged()
         {
-            CreatePopupAdorner();
+            ResetAdornerPopup();
         }
 
         protected virtual void OnIsOpenChanged()
@@ -176,7 +177,7 @@ namespace TestWPF
             UpdatePopupVisibility();
         }
 
-        protected void UpdatePopupChild()
+        private void UpdatePopupChild()
         {
             if (_adornerPopup == null) return;
 

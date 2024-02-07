@@ -12,9 +12,9 @@ using System.Windows.Media;
 
 namespace TestWPF
 {
-    public class AdornerDecorator : Adorner, IAddChild
+    public class DecoratorAdorner : Adorner, IAddChild
     {
-        public AdornerDecorator(UIElement adornedElement) : base(adornedElement)
+        public DecoratorAdorner(UIElement adornedElement) : base(adornedElement)
         {
 
         }

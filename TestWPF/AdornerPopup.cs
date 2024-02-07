@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace TestWPF
 {
-    public class AdornerPopup : AdornerDecorator
+    public class AdornerPopup : DecoratorAdorner
     {
         static AdornerPopup()
         {
@@ -96,9 +96,10 @@ namespace TestWPF
             _failedPlacementModes.Clear();
         }
 
-        private bool TryCreateTransformInfo(Size contentSize)
+        private bool TryCreateTransformInfo()
         {
             _transformInfo = default;
+            _transformInfo.IsValid = false;
 
             var adornerLayer = GetAdornerLayer();
 
@@ -108,7 +109,7 @@ namespace TestWPF
             {
                 _offsetX = 0;
                 _offsetY = 0;
-                return false;
+                return _transformInfo.IsValid;
             }
 
             var transform = AdornedElement.TransformToAncestor(adornerLayerParent);
@@ -124,11 +125,16 @@ namespace TestWPF
             {
                 Constraint = new Size(adornerLayer.ActualWidth, adornerLayer.ActualHeight),
                 AdornedElement = new Rect(origin, adornedElementSize),
-                ContentSize = contentSize,
-                CenterOnPlacementTarget = CenterOnPlacementTarget
+                CenterOnPlacementTarget = CenterOnPlacementTarget,
+                IsValid = true
             };
 
-            return true;
+            return _transformInfo.IsValid;
+        }
+
+        protected virtual Size GetPlacementModeSize(AdornerPopupPlacementMode placementMode)
+        {
+            return Child.DesiredSize;
         }
 
         protected override Size ArrangeOverride(Size arrangeSize)
@@ -137,9 +143,9 @@ namespace TestWPF
 
             if (Child == null) return baseArrangeSize;
 
-            if (!TryCreateTransformInfo(baseArrangeSize)) return baseArrangeSize;
+            if (!TryCreateTransformInfo()) return baseArrangeSize;
 
-            double offsetX, offsetY;
+            double offsetX, offsetY, width, height;
 
             AdornerPopupPlacementMode computedPlacementMode;
 
@@ -147,30 +153,9 @@ namespace TestWPF
             {
                 if (IsAdornedElementInsideAdornerLayer())
                 {
-                    if (_firstAfterLayoutUpdated) ComputedPlacementMode = AdornerPopupPlacementMode.Relative;
-                    else
-                    {
-                        if (!_lastFitted)
-                        {
-                            _failedPlacementModes.Add(ComputedPlacementMode);
-                        }
-                    }
-
-                    CalculateDynamicOffset(PlacementMode, out computedPlacementMode, out offsetX, out offsetY);
+                    GetComputedPlacementMode(PlacementMode, out computedPlacementMode, out offsetX, out offsetY, out width, out height);
 
                     ApplyOffsets(ref offsetX, ref offsetY);
-
-                    if (!_fittedTwice)
-                    {
-                        _lastFitted = ContentFitsInAdornerLayer(offsetX, offsetY);
-
-                        if (_lastFitted && computedPlacementMode == ComputedPlacementMode) _fittedTwice = true;
-                        else Child.InvalidateMeasure();
-
-                        var adornerLayer = GetAdornerLayer();
-
-                        adornerLayer?.Update(AdornedElement);
-                    }
                 }
                 else
                 {
@@ -190,26 +175,24 @@ namespace TestWPF
                         case RelativePosition.BottomLeft: computedPlacementMode = AdornerPopupPlacementMode.TopRight; break;
                     }
 
-                    CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY);
+                    CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
                 }
             }
             else
             {
                 computedPlacementMode = PlacementMode;
 
-                CalculatePlacementModeOffset(PlacementMode, out offsetX, out offsetY);
+                CalculatePlacementModeOffset(PlacementMode, out offsetX, out offsetY, out width, out height);
 
                 ApplyOffsets(ref offsetX, ref offsetY);
             }
 
-            ConstrainToViewIfNeeded(ref offsetX, ref offsetY);
+            ConstrainToViewIfNeeded(width, height, ref offsetX, ref offsetY);
 
             _offsetX = offsetX;
             _offsetY = offsetY;
 
             ComputedPlacementMode = computedPlacementMode;
-
-            _firstAfterLayoutUpdated = false;
 
             return baseArrangeSize;
         }
@@ -232,12 +215,12 @@ namespace TestWPF
             return generalTransform;
         }
 
-        private bool ContentFitsInAdornerLayer(double offsetX, double offsetY)
+        private bool ContentFitsInAdornerLayer(double offsetX, double offsetY, double width, double height)
         {
-            return FitsInAdornerLayer(new Point(offsetX, offsetY)) && FitsInAdornerLayer(new Point(offsetX + _transformInfo.ContentSize.Width, offsetY + _transformInfo.ContentSize.Height));
+            return FitsInAdornerLayer(new Point(offsetX, offsetY)) && FitsInAdornerLayer(new Point(offsetX + width, offsetY + height));
         }
 
-        private bool FitsInAdornerLayer(Point point)
+        protected bool FitsInAdornerLayer(Point point)
         {
             if (point.X < 0) return false;
             if (point.Y < 0) return false;
@@ -248,47 +231,52 @@ namespace TestWPF
             return true;
         }
 
-        private void CalculatePlacementModeOffset(AdornerPopupPlacementMode placementMode, out double offsetX, out double offsetY)
+        protected void CalculatePlacementModeOffset(AdornerPopupPlacementMode placementMode, out double offsetX, out double offsetY, out double width, out double height)
         {
             offsetX = _transformInfo.AdornedElement.Location.X;
             offsetY = _transformInfo.AdornedElement.Location.Y;
 
+            var contentSize = GetPlacementModeSize(placementMode);
+
+            width = contentSize.Width;
+            height = contentSize.Height;
+
             switch (placementMode)
             {
                 case AdornerPopupPlacementMode.BottomLeft:
-                    offsetX -= _transformInfo.ContentSize.Width;
+                    offsetX -= contentSize.Width;
                     offsetY += _transformInfo.AdornedElement.Height;
                     break;
                 case AdornerPopupPlacementMode.Left:
-                    offsetX -= _transformInfo.ContentSize.Width;
+                    offsetX -= contentSize.Width;
 
                     if (_transformInfo.CenterOnPlacementTarget)
                     {
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - _transformInfo.ContentSize.Height / 2;
+                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
                     }
                     break;
                 case AdornerPopupPlacementMode.TopLeft:
-                    offsetX -= _transformInfo.ContentSize.Width;
-                    offsetY -= _transformInfo.ContentSize.Height;
+                    offsetX -= contentSize.Width;
+                    offsetY -= contentSize.Height;
                     break;
                 case AdornerPopupPlacementMode.Top:
                     if (_transformInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - _transformInfo.ContentSize.Width / 2;
+                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
                     }
 
-                    offsetY -= _transformInfo.ContentSize.Height;
+                    offsetY -= contentSize.Height;
                     break;
                 case AdornerPopupPlacementMode.TopRight:
                     offsetX += _transformInfo.AdornedElement.Width;
-                    offsetY -= _transformInfo.ContentSize.Height;
+                    offsetY -= contentSize.Height;
                     break;
                 case AdornerPopupPlacementMode.Right:
                     offsetX += _transformInfo.AdornedElement.Width;
 
                     if (_transformInfo.CenterOnPlacementTarget)
                     {
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - _transformInfo.ContentSize.Height / 2;
+                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
                     }
                     break;
                 case AdornerPopupPlacementMode.BottomRight:
@@ -298,7 +286,7 @@ namespace TestWPF
                 case AdornerPopupPlacementMode.Bottom:
                     if (_transformInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - _transformInfo.ContentSize.Width / 2;
+                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
                     }
 
                     offsetY += _transformInfo.AdornedElement.Height;
@@ -306,17 +294,16 @@ namespace TestWPF
                 case AdornerPopupPlacementMode.Relative:
                     if (_transformInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - _transformInfo.ContentSize.Width / 2;
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - _transformInfo.ContentSize.Height / 2;
+                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
+                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
                     }
                     break;
-
             }
         }
 
-        private bool GetNextPlacementMode(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode nextPlacementMode)
+        private void GetComputedPlacementMode(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode computedPlacementMode, out double offsetX, out double offsetY, out double width, out double height)
         {
-            nextPlacementMode = AdornerPopupPlacementMode.Relative;
+            computedPlacementMode = AdornerPopupPlacementMode.Relative;
 
             AdornerPopupPlacementMode[] tryOrder = new AdornerPopupPlacementMode[7];
 
@@ -400,31 +387,12 @@ namespace TestWPF
             {
                 var placement = tryOrder[i];
 
-                if (!_failedPlacementModes.Contains(placement))
-                {
-                    nextPlacementMode = placement;
+                CalculatePlacementModeOffset(placement, out offsetX, out offsetY, out width, out height);
 
-                    return true;
-                }
+                if (ContentFitsInAdornerLayer(offsetX, offsetY, width, height)) computedPlacementMode = placement;
             }
 
-            return false;
-        }
-
-        private void CalculateDynamicOffset(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode nextPlacementMode, out double offsetX, out double offsetY)
-        {
-            if (_failedPlacementModes.Contains(placementMode))
-            {
-                GetNextPlacementMode(placementMode, out nextPlacementMode);
-
-                CalculatePlacementModeOffset(nextPlacementMode, out offsetX, out offsetY);
-            }
-            else
-            {
-                nextPlacementMode = placementMode;
-
-                CalculatePlacementModeOffset(placementMode, out offsetX, out offsetY);
-            }
+            CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
         }
 
         private void ApplyOffsets(ref double offsetX, ref double offsetY)
@@ -433,12 +401,12 @@ namespace TestWPF
             offsetY += VerticalOffset;
         }
 
-        private void ConstrainToViewIfNeeded(ref double offsetX, ref double offsetY)
+        private void ConstrainToViewIfNeeded(double width, double height, ref double offsetX, ref double offsetY)
         {
             if (KeepWithinView)
             {
-                offsetX = Math.Max(Math.Min(offsetX, _transformInfo.Constraint.Width - _transformInfo.ContentSize.Width), 0);
-                offsetY = Math.Max(Math.Min(offsetY, _transformInfo.Constraint.Height - _transformInfo.ContentSize.Height), 0);
+                offsetX = Math.Max(Math.Min(offsetX, _transformInfo.Constraint.Width - width), 0);
+                offsetY = Math.Max(Math.Min(offsetY, _transformInfo.Constraint.Height - height), 0);
             }
         }
 
@@ -474,9 +442,9 @@ namespace TestWPF
 
             public Rect AdornedElement;
 
-            public Size ContentSize;
-
             public bool CenterOnPlacementTarget;
+
+            public bool IsValid;
         }
 
         private enum RelativePosition

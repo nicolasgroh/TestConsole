@@ -21,9 +21,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition
-        </Grid.ColumnDefinitions>
 
         <Button Content="Test" Height="25" Click="Test_Click"/>
 
