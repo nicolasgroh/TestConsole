@@ -14,6 +14,50 @@ namespace TestWPF
 {
     public class DecoratorAdorner : Adorner, IAddChild
     {
+        private class EmptyEnumerator : IEnumerator
+        {
+            public void Reset() { }
+
+            public bool MoveNext() { return false; }
+
+            public object Current
+            {
+                get
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+        }
+
+        private class SingleChildEnumerator : IEnumerator
+        {
+            internal SingleChildEnumerator(object Child)
+            {
+                _child = Child;
+                _count = Child == null ? 0 : 1;
+            }
+
+            object IEnumerator.Current
+            {
+                get { return (_index == 0) ? _child : null; }
+            }
+
+            bool IEnumerator.MoveNext()
+            {
+                _index++;
+                return _index < _count;
+            }
+
+            void IEnumerator.Reset()
+            {
+                _index = -1;
+            }
+
+            private int _index = -1;
+            private int _count = 0;
+            private object _child;
+        }
+
         public DecoratorAdorner(UIElement adornedElement) : base(adornedElement)
         {
 
