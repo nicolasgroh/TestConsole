@@ -13,6 +13,34 @@ namespace TestWPF
 {
     public class AdornerPopup : DecoratorAdorner
     {
+        #region PrivateObjects
+        private struct LayoutInfo
+        {
+            public Size Constraint;
+
+            public Size ChildSize;
+
+            public Rect AdornedElementRect;
+
+            public bool CenterOnPlacementTarget;
+
+            public AdornerLayer AdornerLayer;
+        }
+
+        private enum RelativePosition
+        {
+            Left,
+            Top,
+            Right,
+            Bottom,
+            TopLeft,
+            TopRight,
+            BottomLeft,
+            BottomRight
+        }
+        #endregion
+
+        #region Constructors
         static AdornerPopup()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AdornerPopup), new FrameworkPropertyMetadata(typeof(AdornerPopup)));
@@ -20,8 +48,9 @@ namespace TestWPF
 
         public AdornerPopup(UIElement adornedElement) : base(adornedElement)
         {
-            
+
         }
+        #endregion
 
         #region DependancyProperties
         public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender, PlacementModePropertyChanged));
@@ -80,172 +109,40 @@ namespace TestWPF
         }
         #endregion
 
-        private TransformInfo _transformInfo;
-
-        private AdornerLayer GetAdornerLayer()
-        {
-            return AdornerLayer.GetAdornerLayer(AdornedElement);
-        }
-
-        private bool TryCreateTransformInfo()
-        {
-            _transformInfo = default;
-            _transformInfo.IsValid = false;
-
-            var adornerLayer = GetAdornerLayer();
-
-            var adornerLayerParent = VisualTreeHelper.GetParent(adornerLayer) as Visual;
-
-            if (adornerLayerParent == null)
-            {
-                _offsetX = 0;
-                _offsetY = 0;
-                return _transformInfo.IsValid;
-            }
-
-            var transform = AdornedElement.TransformToAncestor(adornerLayerParent);
-
-            var origin = transform.Transform(default);
-
-            Size adornedElementSize;
-
-            if (AdornedElement is FrameworkElement frameworkElement) adornedElementSize = new Size(frameworkElement.ActualWidth, frameworkElement.ActualHeight);
-            else adornedElementSize = AdornedElement.RenderSize;
-
-            _transformInfo = new TransformInfo
-            {
-                Constraint = new Size(adornerLayer.ActualWidth, adornerLayer.ActualHeight),
-                AdornedElement = new Rect(origin, adornedElementSize),
-                CenterOnPlacementTarget = CenterOnPlacementTarget,
-                IsValid = true
-            };
-
-            return _transformInfo.IsValid;
-        }
-
-        protected virtual Size GetPlacementModeSize(AdornerPopupPlacementMode placementMode)
-        {
-            return Child.DesiredSize;
-        }
-
+        #region PrivateMember
+        private LayoutInfo _layoutInfo;
         private AdornerPopupPlacementMode _computationPlacementMode;
-        private bool _hookedLoaded = false;
-        private bool _invalidateArrange = false;
+        private bool _hookedDispatcherLoaded = false;
+        private double _offsetX = 0;
+        private double _offsetY = 0;
+        #endregion
 
+        #region Overrides
         protected override Size ArrangeOverride(Size arrangeSize)
         {
             var baseArrangeSize = base.ArrangeOverride(arrangeSize);
 
             if (Child == null) return baseArrangeSize;
 
-            if (!TryCreateTransformInfo()) return baseArrangeSize;
+            if (!TryCreateLayoutInfo()) return baseArrangeSize;
 
-            double offsetX, offsetY, width, height;
-            
-            AdornerPopupPlacementMode computedPlacementMode;
+            double offsetX, offsetY;
 
             if (UseDynamicPlacement)
             {
-                if (IsAdornedElementInsideAdornerLayer())
-                {
-                    //GetComputedPlacementMode(PlacementMode, out computedPlacementMode, out offsetX, out offsetY, out width, out height);
-
-                    System.Diagnostics.Debug.WriteLine($"_computationPlacementMode: {_computationPlacementMode}");
-
-                    CalculatePlacementModeOffset(_computationPlacementMode, out offsetX, out offsetY, out width, out height);
-
-                    var fits = ContentFitsInAdornerLayer(offsetX, offsetY, width, height);
-
-                    System.Diagnostics.Debug.WriteLine($"fits: {fits}");
-
-                    if (!fits)
-                    {
-                        SetNextPlacementMode(PlacementMode);
-
-                        ComputedPlacementMode = _computationPlacementMode;
-
-                        InvalidateArrange();
-                        return baseArrangeSize;
-                    }
-
-                    ComputedPlacementMode = _computationPlacementMode;
-                    InvalidateArrange();
-
-                    ApplyOffsets(ref offsetX, ref offsetY);
-                }
-                else
-                {
-                    var relativePosition = GetAdornedElementPositionRelativeToAdornerLayer();
-
-                    computedPlacementMode = AdornerPopupPlacementMode.Relative;
-
-                    switch (relativePosition)
-                    {
-                        case RelativePosition.Left: computedPlacementMode = AdornerPopupPlacementMode.Right; break;
-                        case RelativePosition.TopLeft: computedPlacementMode = AdornerPopupPlacementMode.BottomRight; break;
-                        case RelativePosition.Top: computedPlacementMode = AdornerPopupPlacementMode.Bottom; break;
-                        case RelativePosition.TopRight: computedPlacementMode = AdornerPopupPlacementMode.BottomLeft; break;
-                        case RelativePosition.Right: computedPlacementMode = AdornerPopupPlacementMode.Left; break;
-                        case RelativePosition.BottomRight: computedPlacementMode = AdornerPopupPlacementMode.TopLeft; break;
-                        case RelativePosition.Bottom: computedPlacementMode = AdornerPopupPlacementMode.Top; break;
-                        case RelativePosition.BottomLeft: computedPlacementMode = AdornerPopupPlacementMode.TopRight; break;
-                    }
-
-                    ComputedPlacementMode = computedPlacementMode;
-
-                    CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
-                }
+                if (IsAdornedElementInsideAdornerLayer()) CalculateDynamicPlacementInsideAdornerLayer(out offsetX, out offsetY);
+                else CalculateDynamicPlacementOutsideAdornerLayer(out offsetX, out offsetY);
             }
-            else
-            {
-                computedPlacementMode = PlacementMode;
-
-                CalculatePlacementModeOffset(PlacementMode, out offsetX, out offsetY, out width, out height);
-
-                ApplyOffsets(ref offsetX, ref offsetY);
-            }
-
-            ConstrainToViewIfNeeded(width, height, ref offsetX, ref offsetY);
+            else CalculateStaticPlacement(out offsetX, out offsetY);
 
             _offsetX = offsetX;
             _offsetY = offsetY;
 
-            _appliedDesiredTransform = false;
-
-            if (!_hookedLoaded)
-            {
-                _hookedLoaded = true;
-
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    System.Diagnostics.Debug.WriteLine($"loaded");
-
-                    _computationPlacementMode = PlacementMode;
-                    _hookedLoaded = false;
-
-                    if (!_appliedDesiredTransform)
-                    {
-                        //var adornerLayer = GetAdornerLayer();
-
-                        //adornerLayer.Update(AdornedElement);
-                    }
-
-                }), System.Windows.Threading.DispatcherPriority.Loaded);
-            }
-
             return baseArrangeSize;
         }
 
-        private double _offsetX = 0;
-        private double _offsetY = 0;
-
-        private bool _appliedDesiredTransform = false;
-
         public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
         {
-            _appliedDesiredTransform = true;
-
-            System.Diagnostics.Debug.WriteLine($"GetDesiredTransform");
             if (generalTransform is Transform transform)
             {
                 var matrix = transform.Value;
@@ -258,189 +155,208 @@ namespace TestWPF
 
             return generalTransform;
         }
+        #endregion
 
-        private bool ContentFitsInAdornerLayer(double offsetX, double offsetY, double width, double height)
+        #region GeneralPlacement
+        private bool TryCreateLayoutInfo()
         {
-            return FitsInAdornerLayer(new Point(offsetX, offsetY)) && FitsInAdornerLayer(new Point(offsetX + width, offsetY + height));
-        }
+            _layoutInfo = default;
 
-        protected bool FitsInAdornerLayer(Point point)
-        {
-            if (point.X < 0) return false;
-            if (point.Y < 0) return false;
+            var adornedElement = AdornedElement;
 
-            if (point.X > _transformInfo.Constraint.Width) return false;
-            if (point.Y > _transformInfo.Constraint.Height) return false;
+            var adornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
+
+            var adornerLayerParent = VisualTreeHelper.GetParent(adornerLayer) as Visual;
+
+            if (adornerLayerParent == null)
+            {
+                _offsetX = 0;
+                _offsetY = 0;
+                return false;
+            }
+
+            var transform = adornedElement.TransformToAncestor(adornerLayerParent);
+
+            var adornedElementPosition = transform.Transform(default);
+
+            _layoutInfo = new LayoutInfo
+            {
+                AdornerLayer = adornerLayer,
+                Constraint = adornerLayer.RenderSize,
+                ChildSize = Child.DesiredSize,
+                AdornedElementRect = new Rect(adornedElementPosition, adornedElement.RenderSize),
+                CenterOnPlacementTarget = CenterOnPlacementTarget
+            };
 
             return true;
         }
 
-        protected void CalculatePlacementModeOffset(AdornerPopupPlacementMode placementMode, out double offsetX, out double offsetY, out double width, out double height)
+        private void CalculatePlacementModeOffset(AdornerPopupPlacementMode placementMode, out double offsetX, out double offsetY)
         {
-            offsetX = _transformInfo.AdornedElement.Location.X;
-            offsetY = _transformInfo.AdornedElement.Location.Y;
-
-            var contentSize = GetPlacementModeSize(placementMode);
-
-            width = contentSize.Width;
-            height = contentSize.Height;
+            offsetX = _layoutInfo.AdornedElementRect.Location.X;
+            offsetY = _layoutInfo.AdornedElementRect.Location.Y;
 
             switch (placementMode)
             {
                 case AdornerPopupPlacementMode.BottomLeft:
-                    offsetX -= contentSize.Width;
-                    offsetY += _transformInfo.AdornedElement.Height;
+                    offsetX -= _layoutInfo.ChildSize.Width;
+                    offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
                 case AdornerPopupPlacementMode.Left:
-                    offsetX -= contentSize.Width;
+                    offsetX -= _layoutInfo.ChildSize.Width;
 
-                    if (_transformInfo.CenterOnPlacementTarget)
+                    if (_layoutInfo.CenterOnPlacementTarget)
                     {
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
+                        offsetY += _layoutInfo.AdornedElementRect.Height / 2 - _layoutInfo.ChildSize.Height / 2;
                     }
                     break;
                 case AdornerPopupPlacementMode.TopLeft:
-                    offsetX -= contentSize.Width;
-                    offsetY -= contentSize.Height;
+                    offsetX -= _layoutInfo.ChildSize.Width;
+                    offsetY -= _layoutInfo.ChildSize.Height;
                     break;
                 case AdornerPopupPlacementMode.Top:
-                    if (_transformInfo.CenterOnPlacementTarget)
+                    if (_layoutInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
+                        offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
                     }
 
-                    offsetY -= contentSize.Height;
+                    offsetY -= _layoutInfo.ChildSize.Height;
                     break;
                 case AdornerPopupPlacementMode.TopRight:
-                    offsetX += _transformInfo.AdornedElement.Width;
-                    offsetY -= contentSize.Height;
+                    offsetX += _layoutInfo.AdornedElementRect.Width;
+                    offsetY -= _layoutInfo.ChildSize.Height;
                     break;
                 case AdornerPopupPlacementMode.Right:
-                    offsetX += _transformInfo.AdornedElement.Width;
+                    offsetX += _layoutInfo.AdornedElementRect.Width;
 
-                    if (_transformInfo.CenterOnPlacementTarget)
+                    if (_layoutInfo.CenterOnPlacementTarget)
                     {
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
+                        offsetY += _layoutInfo.AdornedElementRect.Height / 2 - _layoutInfo.ChildSize.Height / 2;
                     }
                     break;
                 case AdornerPopupPlacementMode.BottomRight:
-                    offsetX += _transformInfo.AdornedElement.Width;
-                    offsetY += _transformInfo.AdornedElement.Height;
+                    offsetX += _layoutInfo.AdornedElementRect.Width;
+                    offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
                 case AdornerPopupPlacementMode.Bottom:
-                    if (_transformInfo.CenterOnPlacementTarget)
+                    if (_layoutInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
+                        offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
                     }
 
-                    offsetY += _transformInfo.AdornedElement.Height;
+                    offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
                 case AdornerPopupPlacementMode.Relative:
-                    if (_transformInfo.CenterOnPlacementTarget)
+                    if (_layoutInfo.CenterOnPlacementTarget)
                     {
-                        offsetX += _transformInfo.AdornedElement.Width / 2 - contentSize.Width / 2;
-                        offsetY += _transformInfo.AdornedElement.Height / 2 - contentSize.Height / 2;
+                        offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
+                        offsetY += _layoutInfo.AdornedElementRect.Height / 2 - _layoutInfo.ChildSize.Height / 2;
                     }
                     break;
             }
         }
 
-        private void GetComputedPlacementMode(AdornerPopupPlacementMode placementMode, out AdornerPopupPlacementMode computedPlacementMode, out double offsetX, out double offsetY, out double width, out double height)
+        private void ApplyUserOffsets(ref double offsetX, ref double offsetY)
         {
-            computedPlacementMode = AdornerPopupPlacementMode.Relative;
-
-            AdornerPopupPlacementMode[] tryOrder = new AdornerPopupPlacementMode[7];
-
-            switch (placementMode)
-            {
-                case AdornerPopupPlacementMode.BottomLeft:
-                    tryOrder[0] = AdornerPopupPlacementMode.Left;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[3] = AdornerPopupPlacementMode.Right;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.Left:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Right;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.TopLeft:
-                    tryOrder[0] = AdornerPopupPlacementMode.Left;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[3] = AdornerPopupPlacementMode.Right;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.Top:
-                    tryOrder[0] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Right;
-                    tryOrder[6] = AdornerPopupPlacementMode.Left;
-                    break;
-                case AdornerPopupPlacementMode.TopRight:
-                    tryOrder[0] = AdornerPopupPlacementMode.Right;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[3] = AdornerPopupPlacementMode.Left;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.Right:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.Left;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.BottomRight:
-                    tryOrder[0] = AdornerPopupPlacementMode.Right;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[3] = AdornerPopupPlacementMode.Left;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
-                    break;
-                case AdornerPopupPlacementMode.Bottom:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Top;
-                    tryOrder[3] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Right;
-                    tryOrder[6] = AdornerPopupPlacementMode.Left;
-                    break;
-            }
-
-            for (int i = 0; i < tryOrder.Length; i++)
-            {
-                var placement = tryOrder[i];
-
-                CalculatePlacementModeOffset(placement, out offsetX, out offsetY, out width, out height);
-
-                if (ContentFitsInAdornerLayer(offsetX, offsetY, width, height)) computedPlacementMode = placement;
-            }
-
-            CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
+            offsetX += HorizontalOffset;
+            offsetY += VerticalOffset;
         }
 
-        private void SetNextPlacementMode(AdornerPopupPlacementMode placementMode)
+        private void ConstrainToViewIfNeeded(ref double offsetX, ref double offsetY)
         {
+            if (KeepWithinView)
+            {
+                offsetX = Math.Max(Math.Min(offsetX, _layoutInfo.Constraint.Width - _layoutInfo.ChildSize.Width), 0);
+                offsetY = Math.Max(Math.Min(offsetY, _layoutInfo.Constraint.Height - _layoutInfo.ChildSize.Height), 0);
+            }
+        }
+
+        private void ResetDynamicPlacement()
+        {
+            _computationPlacementMode = PlacementMode;
+        }
+        #endregion
+
+        #region StaticPlacement
+        private void CalculateStaticPlacement(out double offsetX, out double offsetY)
+        {
+            ResetDynamicPlacement();
+
+            ComputedPlacementMode = PlacementMode;
+
+            CalculatePlacementModeOffset(PlacementMode, out offsetX, out offsetY);
+
+            ApplyUserOffsets(ref offsetX, ref offsetY);
+
+            ConstrainToViewIfNeeded(ref offsetX, ref offsetY);
+        }
+        #endregion
+
+        #region DynamicPlacement
+        private bool IsAdornedElementInsideAdornerLayer()
+        {
+            if (FitsInAdornerLayer(_layoutInfo.AdornedElementRect.TopLeft)) return true;
+            if (FitsInAdornerLayer(_layoutInfo.AdornedElementRect.TopRight)) return true;
+            if (FitsInAdornerLayer(_layoutInfo.AdornedElementRect.BottomLeft)) return true;
+            if (FitsInAdornerLayer(_layoutInfo.AdornedElementRect.BottomRight)) return true;
+
+            return false;
+        }
+
+        private void CalculateDynamicPlacementInsideAdornerLayer(out double offsetX, out double offsetY)
+        {
+            CalculatePlacementModeOffset(_computationPlacementMode, out offsetX, out offsetY);
+
+            if (!WouldContentFitInAdornerLayer(offsetX, offsetY))
+            {
+                var shouldUpdateLayout = SetNextComputationPlacementMode(PlacementMode);
+
+                ComputedPlacementMode = _computationPlacementMode;
+
+                if (shouldUpdateLayout)
+                {
+                    _layoutInfo.AdornerLayer.Update(AdornedElement);
+                }
+            }
+
+            ComputedPlacementMode = _computationPlacementMode;
+
+            HookDispatcherLoaded();
+        }
+
+        private void CalculateDynamicPlacementOutsideAdornerLayer(out double offsetX, out double offsetY)
+        {
+            ResetDynamicPlacement();
+
+            var relativePosition = GetAdornedElementPositionRelativeToAdornerLayer();
+
+            var computedPlacementMode = AdornerPopupPlacementMode.Relative;
+
+            switch (relativePosition)
+            {
+                case RelativePosition.Left: computedPlacementMode = AdornerPopupPlacementMode.Right; break;
+                case RelativePosition.TopLeft: computedPlacementMode = AdornerPopupPlacementMode.BottomRight; break;
+                case RelativePosition.Top: computedPlacementMode = AdornerPopupPlacementMode.Bottom; break;
+                case RelativePosition.TopRight: computedPlacementMode = AdornerPopupPlacementMode.BottomLeft; break;
+                case RelativePosition.Right: computedPlacementMode = AdornerPopupPlacementMode.Left; break;
+                case RelativePosition.BottomRight: computedPlacementMode = AdornerPopupPlacementMode.TopLeft; break;
+                case RelativePosition.Bottom: computedPlacementMode = AdornerPopupPlacementMode.Top; break;
+                case RelativePosition.BottomLeft: computedPlacementMode = AdornerPopupPlacementMode.TopRight; break;
+            }
+
+            ComputedPlacementMode = computedPlacementMode;
+
+            CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY);
+
+            ApplyUserOffsets(ref offsetX, ref offsetY);
+
+            ConstrainToViewIfNeeded(ref offsetX, ref offsetY);
+        }
+
+        private bool SetNextComputationPlacementMode(AdornerPopupPlacementMode placementMode)
+        {
+            if (_computationPlacementMode == AdornerPopupPlacementMode.Relative) return false;
+
             AdornerPopupPlacementMode[] tryOrder = new AdornerPopupPlacementMode[7];
 
             switch (placementMode)
@@ -521,84 +437,64 @@ namespace TestWPF
 
             var currentIndex = Array.IndexOf(tryOrder, _computationPlacementMode);
 
-            _computationPlacementMode = tryOrder[currentIndex + 1];
-        }
-
-        private void ApplyOffsets(ref double offsetX, ref double offsetY)
-        {
-            offsetX += HorizontalOffset;
-            offsetY += VerticalOffset;
-        }
-
-        private void ConstrainToViewIfNeeded(double width, double height, ref double offsetX, ref double offsetY)
-        {
-            if (KeepWithinView)
+            if (currentIndex + 1 >= tryOrder.Length)
             {
-                offsetX = Math.Max(Math.Min(offsetX, _transformInfo.Constraint.Width - width), 0);
-                offsetY = Math.Max(Math.Min(offsetY, _transformInfo.Constraint.Height - height), 0);
+                _computationPlacementMode = AdornerPopupPlacementMode.Relative;
+                return false;
             }
+
+            _computationPlacementMode = tryOrder[currentIndex + 1];
+
+            return true;
         }
 
-        private bool IsAdornedElementInsideAdornerLayer()
+        private bool FitsInAdornerLayer(Point point)
         {
-            if (FitsInAdornerLayer(_transformInfo.AdornedElement.TopLeft)) return true;
-            if (FitsInAdornerLayer(_transformInfo.AdornedElement.TopRight)) return true;
-            if (FitsInAdornerLayer(_transformInfo.AdornedElement.BottomLeft)) return true;
-            if (FitsInAdornerLayer(_transformInfo.AdornedElement.BottomRight)) return true;
+            if (point.X < 0) return false;
+            if (point.Y < 0) return false;
 
-            return false;
+            if (point.X > _layoutInfo.Constraint.Width) return false;
+            if (point.Y > _layoutInfo.Constraint.Height) return false;
+
+            return true;
+        }
+
+        private bool WouldContentFitInAdornerLayer(double offsetX, double offsetY)
+        {
+            return FitsInAdornerLayer(new Point(offsetX, offsetY)) && FitsInAdornerLayer(new Point(offsetX + _layoutInfo.ChildSize.Width, offsetY + _layoutInfo.ChildSize.Height));
+        }
+
+        private void HookDispatcherLoaded()
+        {
+            if (!_hookedDispatcherLoaded)
+            {
+                _hookedDispatcherLoaded = true;
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    _hookedDispatcherLoaded = false;
+
+                    ResetDynamicPlacement();
+
+                }), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
         }
 
         private RelativePosition GetAdornedElementPositionRelativeToAdornerLayer()
         {
-            if (_transformInfo.AdornedElement.BottomRight.X < 0.0 && _transformInfo.AdornedElement.BottomRight.Y < 0.0) return RelativePosition.TopLeft;
-            if (_transformInfo.AdornedElement.BottomLeft.X > _transformInfo.Constraint.Width && _transformInfo.AdornedElement.BottomLeft.Y < 0.0) return RelativePosition.TopRight;
-            if (_transformInfo.AdornedElement.TopLeft.X > _transformInfo.Constraint.Width && _transformInfo.AdornedElement.TopLeft.Y > _transformInfo.Constraint.Height) return RelativePosition.BottomRight;
-            if (_transformInfo.AdornedElement.TopRight.X < 0.0 && _transformInfo.AdornedElement.TopRight.Y > _transformInfo.Constraint.Height) return RelativePosition.BottomLeft;
+            if (_layoutInfo.AdornedElementRect.BottomRight.X < 0.0 && _layoutInfo.AdornedElementRect.BottomRight.Y < 0.0) return RelativePosition.TopLeft;
+            if (_layoutInfo.AdornedElementRect.BottomLeft.X > _layoutInfo.Constraint.Width && _layoutInfo.AdornedElementRect.BottomLeft.Y < 0.0) return RelativePosition.TopRight;
+            if (_layoutInfo.AdornedElementRect.TopLeft.X > _layoutInfo.Constraint.Width && _layoutInfo.AdornedElementRect.TopLeft.Y > _layoutInfo.Constraint.Height) return RelativePosition.BottomRight;
+            if (_layoutInfo.AdornedElementRect.TopRight.X < 0.0 && _layoutInfo.AdornedElementRect.TopRight.Y > _layoutInfo.Constraint.Height) return RelativePosition.BottomLeft;
 
-            if (_transformInfo.AdornedElement.Right < 0.0) return RelativePosition.Left;
-            if (_transformInfo.AdornedElement.Bottom < 0.0) return RelativePosition.Top;
-            if (_transformInfo.AdornedElement.Left > _transformInfo.Constraint.Width) return RelativePosition.Right;
-            if (_transformInfo.AdornedElement.Top > _transformInfo.Constraint.Height) return RelativePosition.Bottom;
+            if (_layoutInfo.AdornedElementRect.Right < 0.0) return RelativePosition.Left;
+            if (_layoutInfo.AdornedElementRect.Bottom < 0.0) return RelativePosition.Top;
+            if (_layoutInfo.AdornedElementRect.Left > _layoutInfo.Constraint.Width) return RelativePosition.Right;
+            if (_layoutInfo.AdornedElementRect.Top > _layoutInfo.Constraint.Height) return RelativePosition.Bottom;
 
             // Sould never happen
             return default;
         }
-
-        private struct TransformInfo
-        {
-            public Size Constraint;
-
-            public Rect AdornedElement;
-
-            public bool CenterOnPlacementTarget;
-
-            public bool IsValid;
-        }
-
-        private enum RelativePosition
-        {
-            Left,
-            Top,
-            Right,
-            Bottom,
-            TopLeft,
-            TopRight,
-            BottomLeft,
-            BottomRight
-        }
-    }
-
-    public enum AdornerPopupPlacementMode
-    {
-        BottomLeft,
-        Left,
-        TopLeft,
-        Top,
-        TopRight,
-        Right,
-        BottomRight,
-        Bottom,
-        Relative
+        #endregion
     }
 }

@@ -78,7 +78,7 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="False" UseDynamicPlacement="False" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
             <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
                 <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
@@ -86,7 +86,7 @@
         </local:AdornerPopupDefinition>
         <AdornerDecorator Grid.Row="1">
             <Canvas Grid.Row="1" x:Name="TestCanvas">
-                <Thumb x:Name="TestThumb" Height="50" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="50"/>
+                <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="50"/>
             </Canvas>
         </AdornerDecorator>
     </Grid>
