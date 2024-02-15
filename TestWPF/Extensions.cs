@@ -40,9 +40,9 @@ namespace TestWPF
         {
             Balloon balloon;
 
-            var adornerPopup = new AdornerPopup(element)
+            var PopupAdorner = new PopupAdorner(element)
             {
-                PlacementMode = AdornerPopupPlacementMode.Top,
+                PlacementMode = PopupAdornerPlacementMode.Top,
                 Child = balloon = new Balloon()
                 {
                     Child = new TextBlock()
@@ -53,7 +53,7 @@ namespace TestWPF
                 }
             };
 
-            balloon.SetBinding(Balloon.BalloonDirectionProperty, new Binding("PlacementMode") { Source = adornerPopup, Converter = new PopupPlacementToBalloonDirectionConverter() });
+            balloon.SetBinding(Balloon.BalloonDirectionProperty, new Binding("PlacementMode") { Source = PopupAdorner, Converter = new PopupPlacementToBalloonDirectionConverter() });
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
@@ -66,10 +66,10 @@ namespace TestWPF
             {
                 timer.Stop();
 
-                adornerLayer?.Remove(adornerPopup);
+                adornerLayer?.Remove(PopupAdorner);
             };
 
-            adornerLayer?.Add(adornerPopup);
+            adornerLayer?.Add(PopupAdorner);
 
             timer.Start();
         }

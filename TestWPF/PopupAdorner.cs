@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace TestWPF
 {
-    public class AdornerPopup : DecoratorAdorner
+    public class PopupAdorner : DecoratorAdorner
     {
         #region PrivateObjects
         private struct LayoutInfo
@@ -41,67 +41,74 @@ namespace TestWPF
         #endregion
 
         #region Constructors
-        static AdornerPopup()
+        static PopupAdorner()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AdornerPopup), new FrameworkPropertyMetadata(typeof(AdornerPopup)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupAdorner), new FrameworkPropertyMetadata(typeof(PopupAdorner)));
         }
 
-        public AdornerPopup(UIElement adornedElement) : base(adornedElement)
+        public PopupAdorner(UIElement adornedElement) : base(adornedElement)
         {
 
         }
         #endregion
 
         #region DependancyProperties
-        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender, PlacementModePropertyChanged));
+        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(PopupAdornerPlacementMode), typeof(PopupAdorner), new FrameworkPropertyMetadata(PopupAdornerPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender, PlacementModePropertyChanged));
 
         private static void PlacementModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((AdornerPopup)d)._computationPlacementMode = (AdornerPopupPlacementMode)e.NewValue;
+            ((PopupAdorner)d)._computationPlacementMode = (PopupAdornerPlacementMode)e.NewValue;
         }
 
-        public AdornerPopupPlacementMode PlacementMode
+        public PopupAdornerPlacementMode PlacementMode
         {
-            get { return (AdornerPopupPlacementMode)GetValue(PlacementModeProperty); }
+            get { return (PopupAdornerPlacementMode)GetValue(PlacementModeProperty); }
             set { SetValue(PlacementModeProperty, value); }
         }
 
-        public static readonly DependencyProperty CenterOnPlacementTargetProperty = DependencyProperty.Register("CenterOnPlacementTarget", typeof(bool), typeof(AdornerPopup), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty CenterOnPlacementTargetProperty = DependencyProperty.Register("CenterOnPlacementTarget", typeof(bool), typeof(PopupAdorner), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public bool CenterOnPlacementTarget
         {
             get { return (bool)GetValue(CenterOnPlacementTargetProperty); }
             set { SetValue(CenterOnPlacementTargetProperty, value); }
         }
 
-        public static readonly DependencyProperty UseDynamicPlacementProperty = DependencyProperty.Register("UseDynamicPlacement", typeof(bool), typeof(AdornerPopup), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty UseDynamicPlacementProperty = DependencyProperty.Register("UseDynamicPlacement", typeof(bool), typeof(PopupAdorner), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public bool UseDynamicPlacement
         {
             get { return (bool)GetValue(UseDynamicPlacementProperty); }
             set { SetValue(UseDynamicPlacementProperty, value); }
         }
 
-        private static readonly DependencyPropertyKey ComputedPlacementModePropertyKey = DependencyProperty.RegisterReadOnly("ComputedPlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new PropertyMetadata(AdornerPopupPlacementMode.Relative));
-        public AdornerPopupPlacementMode ComputedPlacementMode
+        public static readonly DependencyProperty DynamicPlacementModeStrategyProperty = DependencyProperty.Register("DynamicPlacementModeStrategy", typeof(PopupAdornerDynamicPlacementModeStrategy), typeof(PopupAdorner), new FrameworkPropertyMetadata(PopupAdornerDynamicPlacementModeStrategy.Default, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public PopupAdornerDynamicPlacementModeStrategy DynamicPlacementModeStrategy
         {
-            get { return (AdornerPopupPlacementMode)GetValue(ComputedPlacementModePropertyKey.DependencyProperty); }
+            get { return (PopupAdornerDynamicPlacementModeStrategy)GetValue(DynamicPlacementModeStrategyProperty); }
+            set { SetValue(DynamicPlacementModeStrategyProperty, value); }
+        }
+
+        private static readonly DependencyPropertyKey ComputedPlacementModePropertyKey = DependencyProperty.RegisterReadOnly("ComputedPlacementMode", typeof(PopupAdornerPlacementMode), typeof(PopupAdorner), new PropertyMetadata(PopupAdornerPlacementMode.Relative));
+        public PopupAdornerPlacementMode ComputedPlacementMode
+        {
+            get { return (PopupAdornerPlacementMode)GetValue(ComputedPlacementModePropertyKey.DependencyProperty); }
             private set { SetValue(ComputedPlacementModePropertyKey, value); }
         }
 
-        public static readonly DependencyProperty KeepWithinViewProperty = DependencyProperty.Register("KeepWithinView", typeof(bool), typeof(AdornerPopup), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty KeepWithinViewProperty = DependencyProperty.Register("KeepWithinView", typeof(bool), typeof(PopupAdorner), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public bool KeepWithinView
         {
             get { return (bool)GetValue(KeepWithinViewProperty); }
             set { SetValue(KeepWithinViewProperty, value); }
         }
 
-        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.Register("VerticalOffset", typeof(double), typeof(AdornerPopup), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.Register("VerticalOffset", typeof(double), typeof(PopupAdorner), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public double VerticalOffset
         {
             get { return (double)GetValue(VerticalOffsetProperty); }
             set { SetValue(VerticalOffsetProperty, value); }
         }
 
-        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(AdornerPopup), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(PopupAdorner), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
         public double HorizontalOffset
         {
             get { return (double)GetValue(HorizontalOffsetProperty); }
@@ -111,7 +118,7 @@ namespace TestWPF
 
         #region PrivateMember
         private LayoutInfo _layoutInfo;
-        private AdornerPopupPlacementMode _computationPlacementMode;
+        private PopupAdornerPlacementMode _computationPlacementMode;
         private bool _hookedDispatcherLoaded = false;
         private double _offsetX = 0;
         private double _offsetY = 0;
@@ -191,18 +198,18 @@ namespace TestWPF
             return true;
         }
 
-        private void CalculatePlacementModeOffset(AdornerPopupPlacementMode placementMode, out double offsetX, out double offsetY)
+        private void CalculatePlacementModeOffset(PopupAdornerPlacementMode placementMode, out double offsetX, out double offsetY)
         {
             offsetX = _layoutInfo.AdornedElementRect.Location.X;
             offsetY = _layoutInfo.AdornedElementRect.Location.Y;
 
             switch (placementMode)
             {
-                case AdornerPopupPlacementMode.BottomLeft:
+                case PopupAdornerPlacementMode.BottomLeft:
                     offsetX -= _layoutInfo.ChildSize.Width;
                     offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
-                case AdornerPopupPlacementMode.Left:
+                case PopupAdornerPlacementMode.Left:
                     offsetX -= _layoutInfo.ChildSize.Width;
 
                     if (_layoutInfo.CenterOnPlacementTarget)
@@ -210,11 +217,11 @@ namespace TestWPF
                         offsetY += _layoutInfo.AdornedElementRect.Height / 2 - _layoutInfo.ChildSize.Height / 2;
                     }
                     break;
-                case AdornerPopupPlacementMode.TopLeft:
+                case PopupAdornerPlacementMode.TopLeft:
                     offsetX -= _layoutInfo.ChildSize.Width;
                     offsetY -= _layoutInfo.ChildSize.Height;
                     break;
-                case AdornerPopupPlacementMode.Top:
+                case PopupAdornerPlacementMode.Top:
                     if (_layoutInfo.CenterOnPlacementTarget)
                     {
                         offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
@@ -222,11 +229,11 @@ namespace TestWPF
 
                     offsetY -= _layoutInfo.ChildSize.Height;
                     break;
-                case AdornerPopupPlacementMode.TopRight:
+                case PopupAdornerPlacementMode.TopRight:
                     offsetX += _layoutInfo.AdornedElementRect.Width;
                     offsetY -= _layoutInfo.ChildSize.Height;
                     break;
-                case AdornerPopupPlacementMode.Right:
+                case PopupAdornerPlacementMode.Right:
                     offsetX += _layoutInfo.AdornedElementRect.Width;
 
                     if (_layoutInfo.CenterOnPlacementTarget)
@@ -234,11 +241,11 @@ namespace TestWPF
                         offsetY += _layoutInfo.AdornedElementRect.Height / 2 - _layoutInfo.ChildSize.Height / 2;
                     }
                     break;
-                case AdornerPopupPlacementMode.BottomRight:
+                case PopupAdornerPlacementMode.BottomRight:
                     offsetX += _layoutInfo.AdornedElementRect.Width;
                     offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
-                case AdornerPopupPlacementMode.Bottom:
+                case PopupAdornerPlacementMode.Bottom:
                     if (_layoutInfo.CenterOnPlacementTarget)
                     {
                         offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
@@ -246,7 +253,7 @@ namespace TestWPF
 
                     offsetY += _layoutInfo.AdornedElementRect.Height;
                     break;
-                case AdornerPopupPlacementMode.Relative:
+                case PopupAdornerPlacementMode.Relative:
                     if (_layoutInfo.CenterOnPlacementTarget)
                     {
                         offsetX += _layoutInfo.AdornedElementRect.Width / 2 - _layoutInfo.ChildSize.Width / 2;
@@ -330,18 +337,18 @@ namespace TestWPF
 
             var relativePosition = GetAdornedElementPositionRelativeToAdornerLayer();
 
-            var computedPlacementMode = AdornerPopupPlacementMode.Relative;
+            var computedPlacementMode = PopupAdornerPlacementMode.Relative;
 
             switch (relativePosition)
             {
-                case RelativePosition.Left: computedPlacementMode = AdornerPopupPlacementMode.Right; break;
-                case RelativePosition.TopLeft: computedPlacementMode = AdornerPopupPlacementMode.BottomRight; break;
-                case RelativePosition.Top: computedPlacementMode = AdornerPopupPlacementMode.Bottom; break;
-                case RelativePosition.TopRight: computedPlacementMode = AdornerPopupPlacementMode.BottomLeft; break;
-                case RelativePosition.Right: computedPlacementMode = AdornerPopupPlacementMode.Left; break;
-                case RelativePosition.BottomRight: computedPlacementMode = AdornerPopupPlacementMode.TopLeft; break;
-                case RelativePosition.Bottom: computedPlacementMode = AdornerPopupPlacementMode.Top; break;
-                case RelativePosition.BottomLeft: computedPlacementMode = AdornerPopupPlacementMode.TopRight; break;
+                case RelativePosition.Left: computedPlacementMode = PopupAdornerPlacementMode.Right; break;
+                case RelativePosition.TopLeft: computedPlacementMode = PopupAdornerPlacementMode.BottomRight; break;
+                case RelativePosition.Top: computedPlacementMode = PopupAdornerPlacementMode.Bottom; break;
+                case RelativePosition.TopRight: computedPlacementMode = PopupAdornerPlacementMode.BottomLeft; break;
+                case RelativePosition.Right: computedPlacementMode = PopupAdornerPlacementMode.Left; break;
+                case RelativePosition.BottomRight: computedPlacementMode = PopupAdornerPlacementMode.TopLeft; break;
+                case RelativePosition.Bottom: computedPlacementMode = PopupAdornerPlacementMode.Top; break;
+                case RelativePosition.BottomLeft: computedPlacementMode = PopupAdornerPlacementMode.TopRight; break;
             }
 
             ComputedPlacementMode = computedPlacementMode;
@@ -353,85 +360,42 @@ namespace TestWPF
             ConstrainToViewIfNeeded(ref offsetX, ref offsetY);
         }
 
-        private bool SetNextComputationPlacementMode(AdornerPopupPlacementMode placementMode)
+        private bool SetNextComputationPlacementMode(PopupAdornerPlacementMode placementMode)
         {
-            if (_computationPlacementMode == AdornerPopupPlacementMode.Relative) return false;
+            if (_computationPlacementMode == PopupAdornerPlacementMode.Relative) return false;
 
-            AdornerPopupPlacementMode[] tryOrder = new AdornerPopupPlacementMode[7];
+            var strategy = DynamicPlacementModeStrategy;
+
+            PopupAdornerPlacementMode[] tryOrder;
 
             switch (placementMode)
             {
-                case AdornerPopupPlacementMode.BottomLeft:
-                    tryOrder[0] = AdornerPopupPlacementMode.Left;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[3] = AdornerPopupPlacementMode.Right;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.BottomLeft:
+                    tryOrder = strategy.TargetBottomLeft;
                     break;
-                case AdornerPopupPlacementMode.Left:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Right;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.Left:
+                    tryOrder = strategy.TargetLeft;
                     break;
-                case AdornerPopupPlacementMode.TopLeft:
-                    tryOrder[0] = AdornerPopupPlacementMode.Left;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[3] = AdornerPopupPlacementMode.Right;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.TopLeft:
+                    tryOrder = strategy.TargetTopLeft;
                     break;
-                case AdornerPopupPlacementMode.Top:
-                    tryOrder[0] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Right;
-                    tryOrder[6] = AdornerPopupPlacementMode.Left;
+                case PopupAdornerPlacementMode.Top:
+                    tryOrder = strategy.TargetTop;
                     break;
-                case AdornerPopupPlacementMode.TopRight:
-                    tryOrder[0] = AdornerPopupPlacementMode.Right;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[3] = AdornerPopupPlacementMode.Left;
-                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.TopRight:
+                    tryOrder = strategy.TargetTopRight;
                     break;
-                case AdornerPopupPlacementMode.Right:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.Left;
-                    tryOrder[3] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.Right:
+                    tryOrder = strategy.TargetRight;
                     break;
-                case AdornerPopupPlacementMode.BottomRight:
-                    tryOrder[0] = AdornerPopupPlacementMode.Right;
-                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[2] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[3] = AdornerPopupPlacementMode.Left;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
-                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                case PopupAdornerPlacementMode.BottomRight:
+                    tryOrder = strategy.TargetBottomRight;
                     break;
-                case AdornerPopupPlacementMode.Bottom:
-                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
-                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
-                    tryOrder[2] = AdornerPopupPlacementMode.Top;
-                    tryOrder[3] = AdornerPopupPlacementMode.TopRight;
-                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
-                    tryOrder[5] = AdornerPopupPlacementMode.Right;
-                    tryOrder[6] = AdornerPopupPlacementMode.Left;
+                case PopupAdornerPlacementMode.Bottom:
+                    tryOrder = strategy.TargetBottom;
+                    break;
+                default:
+                    tryOrder = Array.Empty<PopupAdornerPlacementMode>();
                     break;
             }
 
@@ -439,7 +403,7 @@ namespace TestWPF
 
             if (currentIndex + 1 >= tryOrder.Length)
             {
-                _computationPlacementMode = AdornerPopupPlacementMode.Relative;
+                _computationPlacementMode = PopupAdornerPlacementMode.Relative;
                 return false;
             }
 

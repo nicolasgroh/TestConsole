@@ -54,9 +54,9 @@
                                     <Border x:Name="RootBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" MouseLeftButtonUp="RootBorder_MouseLeftButtonUp">
                                         <Grid>
                                             <ContentPresenter/>
-                                            <local:AdornerPopupDefinition PlacementTarget="{Binding ElementName=RootBorder}" PlacementMode="Relative" IsOpen="{Binding IsMouseOver, ElementName=RootBorder}">
+                                            <local:PopupAdornerDefinition PlacementTarget="{Binding ElementName=RootBorder}" PlacementMode="Relative" IsOpen="{Binding IsMouseOver, ElementName=RootBorder}">
                                                 <Button Content="Test" Width="50" Height="50" IsHitTestVisible="False"/>
-                                            </local:AdornerPopupDefinition>
+                                            </local:PopupAdornerDefinition>
                                         </Grid>
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -78,12 +78,12 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="False" UseDynamicPlacement="False" CenterOnPlacementTarget="True">
+        <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="False" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
+            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
                 <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
             </local:Balloon>
-        </local:AdornerPopupDefinition>
+        </local:PopupAdornerDefinition>
         <AdornerDecorator Grid.Row="1">
             <Canvas Grid.Row="1" x:Name="TestCanvas">
                 <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="50"/>
