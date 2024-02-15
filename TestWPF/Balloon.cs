@@ -11,11 +11,6 @@ namespace TestWPF
 {
     public class Balloon : Decorator
     {
-        static Balloon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Balloon), new FrameworkPropertyMetadata(typeof(Balloon)));
-        }
-
         private struct GeometryCache
         {
             public Thickness BorderThickness;
@@ -29,13 +24,18 @@ namespace TestWPF
             public double BalloonWidth;
         }
 
-        private struct DiagonalBallonInfo
+        private struct DiagonalBalloonInfo
         {
             public double DiagonalBalloonWidth;
 
             public double DiagonalBalloonThicknessAngleOffsetMultiplier;
 
             public double DiagonalBalloonOffset;
+        }
+
+        static Balloon()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Balloon), new FrameworkPropertyMetadata(typeof(Balloon)));
         }
 
         #region DependencyProperties
@@ -90,7 +90,7 @@ namespace TestWPF
         #endregion
 
         private GeometryCache _geometryCash;
-        private DiagonalBallonInfo _diagonalBalloonInfo;
+        private DiagonalBalloonInfo _diagonalBalloonInfo;
 
         private StreamGeometry _borderGeometry;
         private StreamGeometry _backgroundGreometry;
@@ -117,7 +117,7 @@ namespace TestWPF
 
             var diagonalBalloonThicknessOffsetMultiplier = 1 - diagonalBalloonOffset2 / (diagonalBalloonOffset1 + diagonalBalloonOffset2);
 
-            _diagonalBalloonInfo = new DiagonalBallonInfo
+            _diagonalBalloonInfo = new DiagonalBalloonInfo
             {
                 DiagonalBalloonWidth = diagonalBalloonWidth,
                 DiagonalBalloonThicknessAngleOffsetMultiplier = diagonalBalloonThicknessOffsetMultiplier,
@@ -492,15 +492,6 @@ namespace TestWPF
 
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            _geometryCash = new GeometryCache
-            {
-                BorderThickness = BorderThickness,
-                CornerRadius = CornerRadius,
-                BalloonDirection = BalloonDirection,
-                BalloonLenght = BalloonLenght,
-                BalloonWidth = BalloonWidth
-            };
-
             Point borderTopLeft = new Point(0, 0), borderBottomRight = new Point(arrangeSize.Width, arrangeSize.Height);
 
             ApplyBalloonOffset(ref borderTopLeft, ref borderBottomRight);

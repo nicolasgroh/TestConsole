@@ -14,6 +14,7 @@ namespace TestWPF
 {
     public class DecoratorAdorner : Adorner, IAddChild
     {
+        #region PrivateObjects
         private class EmptyEnumerator : IEnumerator
         {
             public void Reset() { }
@@ -57,12 +58,16 @@ namespace TestWPF
             private int _count = 0;
             private object _child;
         }
+        #endregion
 
+        #region Constructors
         public DecoratorAdorner(UIElement adornedElement) : base(adornedElement)
         {
 
         }
+        #endregion
 
+        #region IAddChild
         public void AddChild(object value)
         {
             if (!(value is UIElement))
@@ -82,7 +87,9 @@ namespace TestWPF
         {
             AddChild(new TextBlock() { Text = text });
         }
+        #endregion
 
+        #region Properties
         UIElement _child;
         public virtual UIElement Child
         {
@@ -101,14 +108,16 @@ namespace TestWPF
                     _child = value;
 
                     AddLogicalChild(_child);
-                    
+
                     AddVisualChild(_child);
 
                     InvalidateMeasure();
                 }
             }
         }
+        #endregion
 
+        #region Overrides
         protected override IEnumerator LogicalChildren
         {
             get
@@ -155,5 +164,6 @@ namespace TestWPF
 
             return arrangeSize;
         }
+        #endregion
     }
 }
