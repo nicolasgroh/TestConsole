@@ -78,7 +78,7 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="False">
+        <local:AdornerPopupDefinition x:Name="TestAdornerPopupDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
             <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:AdornerPopup}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
                 <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>

@@ -374,7 +374,8 @@
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Style.Triggers>
             <Trigger Property="BalloonDirection" Value="TopLeft">
-                
+                <Setter Property="BalloonWidth" Value="10"/>
+                <Setter Property="BalloonLenght" Value="15"/>
             </Trigger>
             <Trigger Property="BalloonDirection" Value="TopRight">
                 <Setter Property="BalloonWidth" Value="10"/>

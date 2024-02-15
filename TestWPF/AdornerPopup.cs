@@ -20,11 +20,17 @@ namespace TestWPF
 
         public AdornerPopup(UIElement adornedElement) : base(adornedElement)
         {
-            LayoutUpdated += AdornerPopup_LayoutUpdated;
+            
         }
 
         #region DependancyProperties
-        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.Register("PlacementMode", typeof(AdornerPopupPlacementMode), typeof(AdornerPopup), new FrameworkPropertyMetadata(AdornerPopupPlacementMode.Bottom, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsRender, PlacementModePropertyChanged));
+
+        private static void PlacementModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((AdornerPopup)d)._computationPlacementMode = (AdornerPopupPlacementMode)e.NewValue;
+        }
+
         public AdornerPopupPlacementMode PlacementMode
         {
             get { return (AdornerPopupPlacementMode)GetValue(PlacementModeProperty); }
@@ -76,24 +82,9 @@ namespace TestWPF
 
         private TransformInfo _transformInfo;
 
-        private bool _firstAfterLayoutUpdated = true;
-        private bool _lastFitted = false;
-        private bool _fittedTwice = false;
-
-        private readonly HashSet<AdornerPopupPlacementMode> _failedPlacementModes = new HashSet<AdornerPopupPlacementMode>(8);
-
         private AdornerLayer GetAdornerLayer()
         {
             return AdornerLayer.GetAdornerLayer(AdornedElement);
-        }
-
-        private void AdornerPopup_LayoutUpdated(object sender, EventArgs e)
-        {
-            _firstAfterLayoutUpdated = true;
-            _lastFitted = false;
-            _fittedTwice = false;
-
-            _failedPlacementModes.Clear();
         }
 
         private bool TryCreateTransformInfo()
@@ -137,6 +128,10 @@ namespace TestWPF
             return Child.DesiredSize;
         }
 
+        private AdornerPopupPlacementMode _computationPlacementMode;
+        private bool _hookedLoaded = false;
+        private bool _invalidateArrange = false;
+
         protected override Size ArrangeOverride(Size arrangeSize)
         {
             var baseArrangeSize = base.ArrangeOverride(arrangeSize);
@@ -146,14 +141,35 @@ namespace TestWPF
             if (!TryCreateTransformInfo()) return baseArrangeSize;
 
             double offsetX, offsetY, width, height;
-
+            
             AdornerPopupPlacementMode computedPlacementMode;
 
             if (UseDynamicPlacement)
             {
                 if (IsAdornedElementInsideAdornerLayer())
                 {
-                    GetComputedPlacementMode(PlacementMode, out computedPlacementMode, out offsetX, out offsetY, out width, out height);
+                    //GetComputedPlacementMode(PlacementMode, out computedPlacementMode, out offsetX, out offsetY, out width, out height);
+
+                    System.Diagnostics.Debug.WriteLine($"_computationPlacementMode: {_computationPlacementMode}");
+
+                    CalculatePlacementModeOffset(_computationPlacementMode, out offsetX, out offsetY, out width, out height);
+
+                    var fits = ContentFitsInAdornerLayer(offsetX, offsetY, width, height);
+
+                    System.Diagnostics.Debug.WriteLine($"fits: {fits}");
+
+                    if (!fits)
+                    {
+                        SetNextPlacementMode(PlacementMode);
+
+                        ComputedPlacementMode = _computationPlacementMode;
+
+                        InvalidateArrange();
+                        return baseArrangeSize;
+                    }
+
+                    ComputedPlacementMode = _computationPlacementMode;
+                    InvalidateArrange();
 
                     ApplyOffsets(ref offsetX, ref offsetY);
                 }
@@ -175,6 +191,8 @@ namespace TestWPF
                         case RelativePosition.BottomLeft: computedPlacementMode = AdornerPopupPlacementMode.TopRight; break;
                     }
 
+                    ComputedPlacementMode = computedPlacementMode;
+
                     CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
                 }
             }
@@ -192,7 +210,28 @@ namespace TestWPF
             _offsetX = offsetX;
             _offsetY = offsetY;
 
-            ComputedPlacementMode = computedPlacementMode;
+            _appliedDesiredTransform = false;
+
+            if (!_hookedLoaded)
+            {
+                _hookedLoaded = true;
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"loaded");
+
+                    _computationPlacementMode = PlacementMode;
+                    _hookedLoaded = false;
+
+                    if (!_appliedDesiredTransform)
+                    {
+                        //var adornerLayer = GetAdornerLayer();
+
+                        //adornerLayer.Update(AdornedElement);
+                    }
+
+                }), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
 
             return baseArrangeSize;
         }
@@ -200,8 +239,13 @@ namespace TestWPF
         private double _offsetX = 0;
         private double _offsetY = 0;
 
+        private bool _appliedDesiredTransform = false;
+
         public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
         {
+            _appliedDesiredTransform = true;
+
+            System.Diagnostics.Debug.WriteLine($"GetDesiredTransform");
             if (generalTransform is Transform transform)
             {
                 var matrix = transform.Value;
@@ -393,6 +437,91 @@ namespace TestWPF
             }
 
             CalculatePlacementModeOffset(computedPlacementMode, out offsetX, out offsetY, out width, out height);
+        }
+
+        private void SetNextPlacementMode(AdornerPopupPlacementMode placementMode)
+        {
+            AdornerPopupPlacementMode[] tryOrder = new AdornerPopupPlacementMode[7];
+
+            switch (placementMode)
+            {
+                case AdornerPopupPlacementMode.BottomLeft:
+                    tryOrder[0] = AdornerPopupPlacementMode.Left;
+                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[2] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[3] = AdornerPopupPlacementMode.Right;
+                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.Left:
+                    tryOrder[0] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[2] = AdornerPopupPlacementMode.Right;
+                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[4] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.TopLeft:
+                    tryOrder[0] = AdornerPopupPlacementMode.Left;
+                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[2] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[3] = AdornerPopupPlacementMode.Right;
+                    tryOrder[4] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.Top:
+                    tryOrder[0] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[1] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[2] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[3] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[5] = AdornerPopupPlacementMode.Right;
+                    tryOrder[6] = AdornerPopupPlacementMode.Left;
+                    break;
+                case AdornerPopupPlacementMode.TopRight:
+                    tryOrder[0] = AdornerPopupPlacementMode.Right;
+                    tryOrder[1] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[2] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[3] = AdornerPopupPlacementMode.Left;
+                    tryOrder[4] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.Right:
+                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[2] = AdornerPopupPlacementMode.Left;
+                    tryOrder[3] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.BottomRight:
+                    tryOrder[0] = AdornerPopupPlacementMode.Right;
+                    tryOrder[1] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[2] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[3] = AdornerPopupPlacementMode.Left;
+                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[5] = AdornerPopupPlacementMode.Bottom;
+                    tryOrder[6] = AdornerPopupPlacementMode.Top;
+                    break;
+                case AdornerPopupPlacementMode.Bottom:
+                    tryOrder[0] = AdornerPopupPlacementMode.BottomRight;
+                    tryOrder[1] = AdornerPopupPlacementMode.BottomLeft;
+                    tryOrder[2] = AdornerPopupPlacementMode.Top;
+                    tryOrder[3] = AdornerPopupPlacementMode.TopRight;
+                    tryOrder[4] = AdornerPopupPlacementMode.TopLeft;
+                    tryOrder[5] = AdornerPopupPlacementMode.Right;
+                    tryOrder[6] = AdornerPopupPlacementMode.Left;
+                    break;
+            }
+
+            var currentIndex = Array.IndexOf(tryOrder, _computationPlacementMode);
+
+            _computationPlacementMode = tryOrder[currentIndex + 1];
         }
 
         private void ApplyOffsets(ref double offsetX, ref double offsetY)
