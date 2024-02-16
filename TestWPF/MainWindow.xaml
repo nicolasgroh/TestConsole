@@ -14,7 +14,7 @@
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="10" GlassFrameThickness="10"/>
     </WindowChrome.WindowChrome>
     <Window.Resources>
-        <local:PopupPlacementToBalloonDirectionConverter x:Key="PopupPlacementToBalloonDirectionConverter"/>
+        <local:PopupPlacementToBeakDirectionConverter x:Key="PopupPlacementToBeakDirectionConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -78,11 +78,14 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="False" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+        <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:Balloon BalloonDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBalloonDirectionConverter}}">
+            <local:BeakedBorder BeakDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBeakDirectionConverter}}" Margin="10">
+                <local:BeakedBorder.Effect>
+                    <DropShadowEffect Color="Gray" Opacity="0.6"/>
+                </local:BeakedBorder.Effect>
                 <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
-            </local:Balloon>
+            </local:BeakedBorder>
         </local:PopupAdornerDefinition>
         <AdornerDecorator Grid.Row="1">
             <Canvas Grid.Row="1" x:Name="TestCanvas">

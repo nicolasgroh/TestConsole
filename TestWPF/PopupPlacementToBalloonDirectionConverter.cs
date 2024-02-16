@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace TestWPF
 {
-    public class PopupPlacementToBalloonDirectionConverter : IValueConverter
+    public class PopupPlacementToBeakDirectionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -16,18 +16,18 @@ namespace TestWPF
             {
                 switch (placementMode)
                 {
-                    case PopupAdornerPlacementMode.BottomLeft: return BalloonDirection.TopRight;
-                    case PopupAdornerPlacementMode.Left: return BalloonDirection.Right;
-                    case PopupAdornerPlacementMode.TopLeft: return BalloonDirection.BottomRight;
-                    case PopupAdornerPlacementMode.Top: return BalloonDirection.Bottom;
-                    case PopupAdornerPlacementMode.TopRight: return BalloonDirection.BottomLeft;
-                    case PopupAdornerPlacementMode.Right: return BalloonDirection.Left;
-                    case PopupAdornerPlacementMode.BottomRight: return BalloonDirection.TopLeft;
-                    case PopupAdornerPlacementMode.Bottom: return BalloonDirection.Top;
+                    case PopupAdornerPlacementMode.BottomLeft: return BeakDirection.TopRight;
+                    case PopupAdornerPlacementMode.Left: return BeakDirection.Right;
+                    case PopupAdornerPlacementMode.TopLeft: return BeakDirection.BottomRight;
+                    case PopupAdornerPlacementMode.Top: return BeakDirection.Bottom;
+                    case PopupAdornerPlacementMode.TopRight: return BeakDirection.BottomLeft;
+                    case PopupAdornerPlacementMode.Right: return BeakDirection.Left;
+                    case PopupAdornerPlacementMode.BottomRight: return BeakDirection.TopLeft;
+                    case PopupAdornerPlacementMode.Bottom: return BeakDirection.Top;
                 }
             }
 
-            return BalloonDirection.None;
+            return BeakDirection.None;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

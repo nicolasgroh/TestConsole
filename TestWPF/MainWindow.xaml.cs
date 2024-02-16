@@ -126,7 +126,7 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            TestThumb.ShowBalloonTip("Balloon Tip Test");
+            TestThumb.ShowBeakTip("Beak Tip Test");
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)

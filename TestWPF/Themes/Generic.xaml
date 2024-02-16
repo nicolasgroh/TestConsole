@@ -336,58 +336,58 @@
     <Style TargetType="{x:Type local:PopupAdorner}">
     </Style>
 
-    <Style TargetType="{x:Type local:Balloon}">
+    <Style TargetType="{x:Type local:BeakedBorder}">
         <Setter Property="Background" Value="#6E3164"/>
         <Setter Property="TextElement.Foreground" Value="White"/>
         <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="BalloonWidth" Value="15"/>
-        <Setter Property="BalloonLenght" Value="10"/>
+        <Setter Property="BeakWidth" Value="15"/>
+        <Setter Property="BeakLenght" Value="10"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#6E3164"/>
         <Style.Triggers>
-            <Trigger Property="BalloonDirection" Value="TopLeft">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="TopLeft">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="TopRight">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="TopRight">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="BottomRight">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="BottomRight">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="BottomLeft">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="BottomLeft">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type local:Balloon}" x:Key="AsanaBalloonStyle">
+    <Style TargetType="{x:Type local:BeakedBorder}" x:Key="AsanaBeakStyle">
         <Setter Property="Background" Value="#424244"/>
         <Setter Property="TextElement.Foreground" Value="#dddcdb"/>
         <Setter Property="CornerRadius" Value="5"/>
-        <Setter Property="BalloonWidth" Value="15"/>
-        <Setter Property="BalloonLenght" Value="8"/>
+        <Setter Property="BeakWidth" Value="15"/>
+        <Setter Property="BeakLenght" Value="8"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Style.Triggers>
-            <Trigger Property="BalloonDirection" Value="TopLeft">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="TopLeft">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="TopRight">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="TopRight">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="BottomRight">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="BottomRight">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
-            <Trigger Property="BalloonDirection" Value="BottomLeft">
-                <Setter Property="BalloonWidth" Value="10"/>
-                <Setter Property="BalloonLenght" Value="15"/>
+            <Trigger Property="BeakDirection" Value="BottomLeft">
+                <Setter Property="BeakWidth" Value="10"/>
+                <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
         </Style.Triggers>
     </Style>
