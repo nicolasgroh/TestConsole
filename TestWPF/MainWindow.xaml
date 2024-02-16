@@ -78,18 +78,18 @@
                 </local:FlexCustomItemsControl.ItemTemplate>
             </local:FlexCustomItemsControl>-->
 
-        <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Left" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
+        <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:BeakedBorder BeakDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBeakDirectionConverter}}" Margin="10">
+            <local:BeakedBorder BeakDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBeakDirectionConverter}}" Margin="8">
                 <local:BeakedBorder.Effect>
-                    <DropShadowEffect Color="Gray" Opacity="0.6"/>
+                    <DropShadowEffect Color="Gray" Opacity="0.6" ShadowDepth="2"/>
                 </local:BeakedBorder.Effect>
-                <TextBlock Text="Tab hinzufügen" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
+                <TextBlock Text="Es muss eine Partner-Nr. angegeben werden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
             </local:BeakedBorder>
         </local:PopupAdornerDefinition>
         <AdornerDecorator Grid.Row="1">
             <Canvas Grid.Row="1" x:Name="TestCanvas">
-                <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="50"/>
+                <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100"/>
             </Canvas>
         </AdornerDecorator>
     </Grid>
