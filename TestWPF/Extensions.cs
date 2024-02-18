@@ -36,14 +36,14 @@ namespace TestWPF
             return (-eps < delta) && (eps > delta);
         }
 
-        public static void ShowBeakTip(this UIElement element, string text)
+        public static void ShowBalloonTip(this UIElement element, string text)
         {
-            BeakedBorder Beak;
+            BeakedBorder balloon;
 
-            var PopupAdorner = new PopupAdorner(element)
+            var popupAdorner = new PopupAdorner(element)
             {
                 PlacementMode = PopupAdornerPlacementMode.Top,
-                Child = Beak = new BeakedBorder()
+                Child = balloon = new BeakedBorder()
                 {
                     Child = new TextBlock()
                     {
@@ -53,7 +53,7 @@ namespace TestWPF
                 }
             };
 
-            Beak.SetBinding(BeakedBorder.BeakDirectionProperty, new Binding("PlacementMode") { Source = PopupAdorner, Converter = new PopupPlacementToBeakDirectionConverter() });
+            balloon.SetBinding(BeakedBorder.BeakDirectionProperty, new Binding("PlacementMode") { Source = popupAdorner, Converter = new PopupPlacementToBeakDirectionConverter() });
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
@@ -66,12 +66,27 @@ namespace TestWPF
             {
                 timer.Stop();
 
-                adornerLayer?.Remove(PopupAdorner);
+                adornerLayer?.Remove(popupAdorner);
             };
 
-            adornerLayer?.Add(PopupAdorner);
+            adornerLayer?.Add(popupAdorner);
 
             timer.Start();
+        }
+
+        public static T GetParentOfType<T>(this DependencyObject element)
+        {
+            DependencyObject parent;
+
+            do
+            {
+                parent = VisualTreeHelper.GetParent(element);
+
+                if (parent is T parentOfType) return parentOfType;
+            }
+            while (parent != null);
+
+            return default;
         }
     }
 }

@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Test" Height="25" Click="Test_Click"/>
+        <Button Content="Test" Height="25" x:Name="TestButton" Click="Test_Click" local:BadgeService.Badge="Test"/>
 
         <local:TablePanel Grid.Row="1" VerticalAlignment="Top" HorizontalGap="10" VerticalGap="10">
             <local:TablePanel.ColumnDefinitions>
@@ -40,7 +40,7 @@
             <Button Content="Test4"/>
             <Button Content="Test5"/>
             <Button Content="Test6"/>
-            <Button Content="Test7"/>
+            <Button Content="Test7" local:BadgeService.Badge="Badge Test"/>
         </local:TablePanel>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
@@ -87,10 +87,9 @@
                 <TextBlock Text="Es muss eine Partner-Nr. angegeben werden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
             </local:BeakedBorder>
         </local:PopupAdornerDefinition>
-        <AdornerDecorator Grid.Row="1">
-            <Canvas Grid.Row="1" x:Name="TestCanvas">
-                <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100"/>
-            </Canvas>
-        </AdornerDecorator>
+
+        <Canvas Grid.Row="1" x:Name="TestCanvas">
+            <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100"/>
+        </Canvas>
     </Grid>
 </Window>

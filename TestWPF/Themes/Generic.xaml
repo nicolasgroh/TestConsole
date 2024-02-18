@@ -87,7 +87,7 @@
         </Setter>
     </Style>
     <!--#endregion-->
-    
+
     <Style TargetType="CalendarDayButton" x:Key="CalendarDayButtonStyle">
         <Setter Property="MinWidth" Value="5" />
         <Setter Property="MinHeight" Value="5" />
@@ -222,7 +222,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                
+
                                 <Button x:Name="PART_PreviousButton" Template="{StaticResource PreviousButtonTemplate}" Focusable="False" HorizontalAlignment="Left" Height="20" Width="28" />
                                 <Button x:Name="PART_HeaderButton" Grid.Column="1" Background="Transparent" FontWeight="Bold" Focusable="False" FontSize="10.5" HorizontalAlignment="Center" VerticalAlignment="Center" Template="{StaticResource HeaderButtonTemplate}"/>
                                 <Button x:Name="PART_NextButton" Grid.Column="2" Grid.Row="0" Focusable="False" HorizontalAlignment="Right" Template="{StaticResource NextButtonTemplate}" Height="20" Width="28" />
@@ -309,7 +309,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CustomItemsControl}">
                     <ScrollViewer x:Name="PART_ContentHost" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        
+
                     </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>
@@ -390,5 +390,15 @@
                 <Setter Property="BeakLenght" Value="15"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type local:Badge}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Badge}">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>
