@@ -13,6 +13,72 @@ namespace TestWPF
 {
     public static class BadgeService
     {
+        private class BadgeAdorner : DecoratorAdorner
+        {
+            internal BadgeAdorner(UIElement adornedElement, Badge badge) : base(adornedElement)
+            {
+                _badge = badge;
+                Child = _badge;
+            }
+
+            private Badge _badge;
+
+            public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
+            {
+                if (generalTransform is Transform transform)
+                {
+                    CalculateOffsets(out var offsetX, out var offsetY);
+
+                    var matrix = transform.Value;
+
+                    matrix.OffsetX += offsetX;
+                    matrix.OffsetY += offsetY;
+
+                    return new MatrixTransform(matrix);
+                }
+
+                return generalTransform;
+            }
+
+            private double GetHorizontalOffset(UIElement adornedElement)
+            {
+                var adornedElementValueSource = DependencyPropertyHelper.GetValueSource(adornedElement, HorizontalOffsetProperty);
+
+                if (adornedElementValueSource.BaseValueSource == BaseValueSource.Default) return _badge.HorizontalOffset;
+
+                return BadgeService.GetHorizontalOffset(adornedElement);
+            }
+
+            private double GetVerticalOffset(UIElement adornedElement)
+            {
+                var adornedElementValueSource = DependencyPropertyHelper.GetValueSource(adornedElement, VerticalOffsetProperty);
+
+                if (adornedElementValueSource.BaseValueSource == BaseValueSource.Default) return _badge.VerticalOffset;
+
+                return BadgeService.GetVerticalOffset(adornedElement);
+            }
+
+            private void CalculateOffsets(out double offsetX, out double offsetY)
+            {
+                var adornedElement = AdornedElement;
+
+                var adornedElementSize = adornedElement.RenderSize;
+                var childSize = Child.DesiredSize;
+
+                var horizontalOffset = GetHorizontalOffset(adornedElement);
+                var verticalOffset = GetVerticalOffset(adornedElement);
+
+                offsetX = adornedElementSize.Width * horizontalOffset;
+                offsetX -= childSize.Width * horizontalOffset;
+
+                offsetY = adornedElementSize.Height * verticalOffset;
+                offsetY -= childSize.Height * verticalOffset;
+
+                if (offsetX < 0) offsetX = 0;
+                if (offsetY < 0) offsetY = 0;
+            }
+        }
+
         public static readonly DependencyProperty BadgeProperty = DependencyProperty.RegisterAttached("Badge", typeof(object), typeof(BadgeService), new FrameworkPropertyMetadata(null, BadgePropertyChanged));
 
         private static void BadgePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -85,8 +151,11 @@ namespace TestWPF
 
         private static object CoerceOffsetProperty(DependencyObject d, object baseValue)
         {
-            var offset = (double)baseValue;
+            return CoerceOffset((double)baseValue);
+        }
 
+        internal static double CoerceOffset(double offset)
+        {
             if (offset > 1d) return 1d;
             if (offset < 0d) return 0;
 
@@ -97,14 +166,19 @@ namespace TestWPF
         {
             var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
-            if (adornerLayer == null) element.Dispatcher.BeginInvoke(new Action(() =>
+            if (adornerLayer == null) HookupLoaded(element);
+            else CreateBadge(element, adornerLayer);
+        }
+
+        private static void HookupLoaded(UIElement element)
+        {
+            element.Dispatcher.BeginInvoke(new Action(() =>
             {
                 var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
                 if (adornerLayer != null) CreateBadge(element, adornerLayer);
 
             }), System.Windows.Threading.DispatcherPriority.Loaded);
-            else CreateBadge(element, adornerLayer);
         }
 
         private static void CreateBadge(UIElement element, AdornerLayer adornerLayer)
@@ -116,13 +190,16 @@ namespace TestWPF
             adornerLayer.Add(badgeAdorner);
         }
 
-        private static void UpdateElementBadgeAdorner(DependencyObject obj)
+        internal static void UpdateElementBadgeAdorner(DependencyObject obj)
         {
             if (obj is UIElement element && GetBadge(obj) != null)
             {
                 var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
-                adornerLayer?.Update(element);
+                if (adornerLayer != null && adornerLayer.GetAdorners(element).Length > 0)
+                {
+                    adornerLayer?.Update(element);
+                }
             }
         }
     }

@@ -28,23 +28,54 @@ namespace TestWPF
         }
 
         private UIElement _placementTarget;
-        public UIElement PlacementTarget
+
+        public static readonly DependencyProperty HorizontalOffsetProperty = BadgeService.HorizontalOffsetProperty.AddOwner(typeof(Badge), new FrameworkPropertyMetadata(0d, HorizontalAlignmentPropertyChanged, CoerceHorizontalOffsetProperty));
+
+        private static void HorizontalAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get { return _placementTarget; }
+            ((Badge)d).PlacementPropertyChanged();
         }
 
-        public static readonly DependencyProperty HorizontalOffsetProperty = BadgeService.HorizontalOffsetProperty.AddOwner(typeof(Badge));
+        private static object CoerceHorizontalOffsetProperty(DependencyObject d, object value)
+        {
+            return CoerceOffsetProperty(d, HorizontalOffsetProperty, (double)value);
+        }
+
         public double HorizontalOffset
         {
-            get { return BadgeService.GetHorizontalOffset(PlacementTarget); }
-            set { BadgeService.SetHorizontalOffset(PlacementTarget, value); }
+            get { return (double)GetValue(HorizontalOffsetProperty); }
+            set { SetValue(HorizontalOffsetProperty, value); }
         }
 
-        public static readonly DependencyProperty VerticalOffsetProperty = BadgeService.VerticalOffsetProperty.AddOwner(typeof(Badge));
+        public static readonly DependencyProperty VerticalOffsetProperty = BadgeService.VerticalOffsetProperty.AddOwner(typeof(Badge), new FrameworkPropertyMetadata(0d, VerticalOffsetPropertyChanged, CoerceVerticalOffsetProperty));
+
+        private static void VerticalOffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((Badge)d).PlacementPropertyChanged();
+        }
+
+        private static object CoerceVerticalOffsetProperty(DependencyObject d, object value)
+        {
+            return CoerceOffsetProperty(d, VerticalOffsetProperty, (double)value);
+        }
+
         public double VerticalOffset
         {
-            get { return BadgeService.GetVerticalOffset(PlacementTarget); }
-            set { BadgeService.SetVerticalOffset(PlacementTarget, value); }
+            get { return (double)GetValue(VerticalOffsetProperty); }
+            set { SetValue(VerticalOffsetProperty, value); }
+        }
+
+        private static object CoerceOffsetProperty(DependencyObject d, DependencyProperty property, double value)
+        {
+            var placementTargetValueSource = DependencyPropertyHelper.GetValueSource(d, property);
+
+            if (placementTargetValueSource.BaseValueSource == BaseValueSource.Default) return BadgeService.CoerceOffset(value);
+            else return d.GetValue(property);
+        }
+
+        private void PlacementPropertyChanged()
+        {
+            BadgeService.UpdateElementBadgeAdorner(_placementTarget);
         }
     }
 }
