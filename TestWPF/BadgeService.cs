@@ -11,15 +11,6 @@ using System.Windows.Media;
 
 namespace TestWPF
 {
-    public enum BadgeLocation
-    {
-        Center,
-        TopLeft,
-        TopRight,
-        BottomRight,
-        BottomLeft
-    }
-
     public static class BadgeService
     {
         public static readonly DependencyProperty BadgeProperty = DependencyProperty.RegisterAttached("Badge", typeof(object), typeof(BadgeService), new FrameworkPropertyMetadata(null, BadgePropertyChanged));
@@ -36,16 +27,19 @@ namespace TestWPF
                     {
                         var elementAdorners = adornerLayer.GetAdorners(element);
 
-                        foreach (var badgeAdorner in elementAdorners.Where(x => x is BadgeAdorner))
+                        if (elementAdorners != null)
                         {
-                            adornerLayer.Remove(badgeAdorner);
+                            foreach (var badgeAdorner in elementAdorners.Where(x => x is BadgeAdorner))
+                            {
+                                adornerLayer.Remove(badgeAdorner);
+                            }
                         }
                     }
                 }
 
                 if (e.NewValue != null)
                 {
-                    CreateBadge(element);
+                    InitilizeBadge(element);
                 }
             }
         }
@@ -60,29 +54,7 @@ namespace TestWPF
             obj.SetValue(BadgeProperty, value);
         }
 
-        public static readonly DependencyProperty LocationProperty = DependencyProperty.RegisterAttached("Location", typeof(BadgeLocation), typeof(BadgeService), new FrameworkPropertyMetadata(BadgeLocation.TopLeft, LocationPropertyChanged));
-
-        private static void LocationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            OnPlacementPropertyChanged(d);
-        }
-
-        public static BadgeLocation GetLocation(DependencyObject obj)
-        {
-            return (BadgeLocation)obj.GetValue(LocationProperty);
-        }
-
-        public static void SetLocation(DependencyObject obj, BadgeLocation value)
-        {
-            obj.SetValue(LocationProperty, value);
-        }
-
-        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, HorizontalOffsetPropertyChanged));
-
-        private static void HorizontalOffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            OnPlacementPropertyChanged(d);
-        }
+        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, OffsetPropertyChanged, CoerceOffsetProperty));
 
         public static double GetHorizontalOffset(DependencyObject obj)
         {
@@ -94,12 +66,7 @@ namespace TestWPF
             obj.SetValue(HorizontalOffsetProperty, value);
         }
 
-        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.RegisterAttached("VerticalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, VerticalOffsetPropertyChanged));
-
-        private static void VerticalOffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            OnPlacementPropertyChanged(d);
-        }
+        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.RegisterAttached("VerticalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, OffsetPropertyChanged, CoerceOffsetProperty));
 
         public static double GetVerticalOffset(DependencyObject obj)
         {
@@ -111,30 +78,45 @@ namespace TestWPF
             obj.SetValue(VerticalOffsetProperty, value);
         }
 
-        private static void CreateBadge(UIElement element)
+        private static void OffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UpdateElementBadgeAdorner(d);
+        }
+
+        private static object CoerceOffsetProperty(DependencyObject d, object baseValue)
+        {
+            var offset = (double)baseValue;
+
+            if (offset > 1d) return 1d;
+            if (offset < 0d) return 0;
+
+            return offset;
+        }
+
+        private static void InitilizeBadge(UIElement element)
         {
             var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
-            if (adornerLayer != null)
+            if (adornerLayer == null) element.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var badge = new Badge(element);
+                var adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
-                var badgeAdorner = new BadgeAdorner(element, badge);
+                if (adornerLayer != null) CreateBadge(element, adornerLayer);
 
-                adornerLayer.Add(badgeAdorner);
-            }
-            else
-            {
-                var window = element.GetParentOfType<Window>();
-
-                if (window != null)
-                {
-                    
-                }
-            }
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
+            else CreateBadge(element, adornerLayer);
         }
 
-        private static void OnPlacementPropertyChanged(DependencyObject obj)
+        private static void CreateBadge(UIElement element, AdornerLayer adornerLayer)
+        {
+            var badge = new Badge(element);
+
+            var badgeAdorner = new BadgeAdorner(element, badge);
+
+            adornerLayer.Add(badgeAdorner);
+        }
+
+        private static void UpdateElementBadgeAdorner(DependencyObject obj)
         {
             if (obj is UIElement element && GetBadge(obj) != null)
             {

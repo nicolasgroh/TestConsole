@@ -393,10 +393,15 @@
     </Style>
 
     <Style TargetType="{x:Type local:Badge}">
+        <Setter Property="Background" Value="Crimson"/>
+        <Setter Property="Padding" Value="8 2"/>
+        <Setter Property="Foreground" Value="White"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Badge}">
-                    <ContentPresenter/>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

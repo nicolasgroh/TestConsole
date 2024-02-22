@@ -10,11 +10,9 @@ namespace TestWPF
 {
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        public App()
         {
-            var test = MainWindow;
-
-            base.OnStartup(e);
+            InitializeComponent();
         }
     }
 }

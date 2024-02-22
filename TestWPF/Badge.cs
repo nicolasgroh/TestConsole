@@ -33,13 +33,6 @@ namespace TestWPF
             get { return _placementTarget; }
         }
 
-        public static readonly DependencyProperty LocationProperty = BadgeService.LocationProperty.AddOwner(typeof(Badge));
-        public BadgeLocation Location
-        {
-            get { return BadgeService.GetLocation(PlacementTarget); }
-            set { BadgeService.SetLocation(PlacementTarget, value); }
-        }
-
         public static readonly DependencyProperty HorizontalOffsetProperty = BadgeService.HorizontalOffsetProperty.AddOwner(typeof(Badge));
         public double HorizontalOffset
         {

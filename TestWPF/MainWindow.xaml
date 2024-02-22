@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Test" Height="25" x:Name="TestButton" Click="Test_Click" local:BadgeService.Badge="Test"/>
+        <Button Content="Test" Height="25" x:Name="TestButton" Click="Test_Click" local:BadgeService.Badge="Test" local:BadgeService.HorizontalOffset="1" local:BadgeService.VerticalOffset="0"/>
 
         <local:TablePanel Grid.Row="1" VerticalAlignment="Top" HorizontalGap="10" VerticalGap="10">
             <local:TablePanel.ColumnDefinitions>
@@ -89,7 +89,7 @@
         </local:PopupAdornerDefinition>
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100"/>
+            <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.Badge="Neu" local:BadgeService.HorizontalOffset="1" local:BadgeService.VerticalOffset="1"/>
         </Canvas>
     </Grid>
 </Window>
