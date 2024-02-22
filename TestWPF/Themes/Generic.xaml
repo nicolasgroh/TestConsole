@@ -337,13 +337,18 @@
     </Style>
 
     <Style TargetType="{x:Type local:BeakedBorder}">
-        <Setter Property="Background" Value="#6E3164"/>
-        <Setter Property="TextElement.Foreground" Value="White"/>
-        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="TextElement.Foreground" Value="Black"/>
+        <Setter Property="CornerRadius" Value="2"/>
         <Setter Property="BeakWidth" Value="15"/>
         <Setter Property="BeakLenght" Value="10"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#6E3164"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="2" ShadowDepth="0" Direction="270" RenderingBias="Performance" Color="#CCCCCC"/>
+            </Setter.Value>
+        </Setter>
         <Style.Triggers>
             <Trigger Property="BeakDirection" Value="TopLeft">
                 <Setter Property="BeakWidth" Value="10"/>

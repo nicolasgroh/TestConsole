@@ -11,7 +11,7 @@
         d:DesignHeight="800"
         Width="800">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="10" GlassFrameThickness="10"/>
+        <WindowChrome CaptionHeight="20" ResizeBorderThickness="10" GlassFrameThickness="10"/>
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <local:PopupPlacementToBeakDirectionConverter x:Key="PopupPlacementToBeakDirectionConverter"/>
@@ -80,11 +80,11 @@
 
         <local:PopupAdornerDefinition x:Name="TestPopupAdornerDefinition" PlacementMode="Top" PlacementTarget="{Binding ElementName=TestThumb}" IsOpen="True" KeepWithinViewport="True" UseDynamicPlacement="True" CenterOnPlacementTarget="True">
             <!--14.5  Background="#FFCFFFCC" BorderBrush="#FF0FC300"  Background="#FFFFD6D6" BorderBrush="Red"-->
-            <local:BeakedBorder BeakDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBeakDirectionConverter}}" Margin="8">
+            <local:BeakedBorder BeakDirection="{Binding ComputedPlacementMode, RelativeSource={RelativeSource AncestorType=local:PopupAdorner}, Converter={StaticResource PopupPlacementToBeakDirectionConverter}}" Margin="4">
                 <local:BeakedBorder.Effect>
                     <DropShadowEffect Color="Gray" Opacity="0.6" ShadowDepth="2"/>
                 </local:BeakedBorder.Effect>
-                <TextBlock Text="Es muss eine Partner-Nr. angegeben werden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10"/>
+                <TextBlock Text="Es muss eine Partner-Nr. angegeben werden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 8"/>
             </local:BeakedBorder>
         </local:PopupAdornerDefinition>
         <AdornerDecorator Grid.Row="1">
