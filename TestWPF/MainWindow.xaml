@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Test" Height="25" x:Name="TestButton" Click="Test_Click" local:BadgeService.Badge="Test" local:BadgeService.HorizontalOffset="1" local:BadgeService.VerticalOffset="0"/>
+        <Button Content="Test" Height="25" x:Name="TestButton" Click="Test_Click"/>
 
         <local:TablePanel Grid.Row="1" VerticalAlignment="Top" HorizontalGap="10" VerticalGap="10">
             <local:TablePanel.ColumnDefinitions>
@@ -40,7 +40,7 @@
             <Button Content="Test4"/>
             <Button Content="Test5"/>
             <Button Content="Test6"/>
-            <Button Content="Test7" local:BadgeService.Badge="Badge Test"/>
+            <Button Content="Test7"/>
         </local:TablePanel>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
@@ -84,12 +84,12 @@
                 <local:BeakedBorder.Effect>
                     <DropShadowEffect Color="Gray" Opacity="0.6" ShadowDepth="2"/>
                 </local:BeakedBorder.Effect>
-                <TextBlock Text="Es muss eine Partner-Nr. angegeben werden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 8"/>
+                <TextBlock Text="Hallo!" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 8"/>
             </local:BeakedBorder>
         </local:PopupAdornerDefinition>
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="50" Width="200" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.Badge="Neu" local:BadgeService.HorizontalOffset="1" local:BadgeService.VerticalOffset="1"/>
+            <Thumb x:Name="TestThumb" Height="100" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.Badge="Neu" local:BadgeService.HorizontalOffset="0.95" local:BadgeService.VerticalOffset="0.95"/>
         </Canvas>
     </Grid>
 </Window>
