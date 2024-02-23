@@ -22,6 +22,10 @@ namespace TestWPF
             }
 
             private Badge _badge;
+            internal Badge Badge
+            {
+                get { return _badge; }
+            }
 
             public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
             {
@@ -120,6 +124,29 @@ namespace TestWPF
             obj.SetValue(BadgeProperty, value);
         }
 
+        public static readonly DependencyProperty StyleProperty = DependencyProperty.RegisterAttached("Style", typeof(Style), typeof(BadgeService), new FrameworkPropertyMetadata(null, StylePropertyChanged));
+
+        private static void StylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement element)
+            {
+                if (TryGetElementBadge(element, out var badge))
+                {
+                    badge.Style = (Style)e.NewValue;
+                }
+            }
+        }
+
+        public static Style GetStyle(DependencyObject obj)
+        {
+            return (Style)obj.GetValue(StyleProperty);
+        }
+
+        public static void SetStyle(DependencyObject obj, Style value)
+        {
+            obj.SetValue(StyleProperty, value);
+        }
+
         public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, OffsetPropertyChanged, CoerceOffsetProperty));
 
         public static double GetHorizontalOffset(DependencyObject obj)
@@ -160,6 +187,28 @@ namespace TestWPF
             if (offset < 0d) return 0;
 
             return offset;
+        }
+
+        private static bool TryGetElementBadge(UIElement element, out Badge badge)
+        {
+            badge = null;
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+
+            if (adornerLayer != null)
+            {
+                var elementAdorners = adornerLayer.GetAdorners(element);
+
+                var badgeAdorner = (BadgeAdorner)elementAdorners.FirstOrDefault(x => x is BadgeAdorner);
+
+                if (badgeAdorner != null)
+                {
+                    badge = badgeAdorner.Badge;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void InitilizeBadge(UIElement element)

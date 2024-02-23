@@ -89,7 +89,7 @@
         </local:PopupAdornerDefinition>
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="100" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.Badge="Up to date" local:BadgeService.HorizontalOffset="0.95" local:BadgeService.VerticalOffset="0.95"/>
+            <Thumb x:Name="TestThumb" Height="100" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.Badge="Up to date"/>
         </Canvas>
     </Grid>
 </Window>
