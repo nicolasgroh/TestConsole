@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 
@@ -15,16 +16,37 @@ namespace TestWPF
     {
         private class BadgeAdorner : DecoratorAdorner
         {
-            internal BadgeAdorner(UIElement adornedElement, Badge badge) : base(adornedElement)
+            public BadgeAdorner(UIElement adornedElement, BadgeCollection badges) : base(adornedElement)
             {
-                _badge = badge;
-                Child = _badge;
+                Hookup(badges);
             }
 
-            private Badge _badge;
-            internal Badge Badge
+            BadgeCollection _badges;
+
+            public BadgeCollection Badges
             {
-                get { return _badge; }
+                get { return _badges; }
+            }
+
+            public void Hookup(BadgeCollection badges)
+            {
+                _badges = badges;
+
+                Child = badges.GetItemsHost();
+
+                _badges.ItemsHostChanged += Badges_ItemsHostChanged;
+            }
+
+            public void Unhook()
+            {
+                Child = null;
+                _badges.ItemsHostChanged -= Badges_ItemsHostChanged;
+                _badges = null;
+            }
+
+            private void Badges_ItemsHostChanged(object sender, BadgeCollectionItemsHostChangedEventArgs e)
+            {
+                Child = e.NewValue;
             }
 
             public override GeneralTransform GetDesiredTransform(GeneralTransform generalTransform)
@@ -42,24 +64,6 @@ namespace TestWPF
                 }
 
                 return generalTransform;
-            }
-
-            private double GetHorizontalOffset(UIElement adornedElement)
-            {
-                var adornedElementValueSource = DependencyPropertyHelper.GetValueSource(adornedElement, HorizontalOffsetProperty);
-
-                if (adornedElementValueSource.BaseValueSource == BaseValueSource.Default) return _badge.HorizontalOffset;
-
-                return BadgeService.GetHorizontalOffset(adornedElement);
-            }
-
-            private double GetVerticalOffset(UIElement adornedElement)
-            {
-                var adornedElementValueSource = DependencyPropertyHelper.GetValueSource(adornedElement, VerticalOffsetProperty);
-
-                if (adornedElementValueSource.BaseValueSource == BaseValueSource.Default) return _badge.VerticalOffset;
-
-                return BadgeService.GetVerticalOffset(adornedElement);
             }
 
             private void CalculateOffsets(out double offsetX, out double offsetY)
@@ -83,71 +87,41 @@ namespace TestWPF
             }
         }
 
-        public static readonly DependencyProperty BadgeProperty = DependencyProperty.RegisterAttached("Badge", typeof(object), typeof(BadgeService), new FrameworkPropertyMetadata(null, BadgePropertyChanged));
+        public static readonly DependencyProperty BadgesProperty = DependencyProperty.RegisterAttached("Badges", typeof(BadgeCollection), typeof(BadgeCollection), new FrameworkPropertyMetadata(new StackingBadgeCollection(), BadgesPropertyChanged));
 
-        private static void BadgePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void BadgesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is UIElement element)
             {
                 if (e.OldValue != null)
                 {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+                    var oldValue = (BadgeCollection)e.OldValue;
 
-                    if (adornerLayer != null)
-                    {
-                        var elementAdorners = adornerLayer.GetAdorners(element);
-
-                        if (elementAdorners != null)
-                        {
-                            foreach (var badgeAdorner in elementAdorners.Where(x => x is BadgeAdorner))
-                            {
-                                adornerLayer.Remove(badgeAdorner);
-                            }
-                        }
-                    }
+                    oldValue.UnhookPlacementTarget();
                 }
 
                 if (e.NewValue != null)
                 {
-                    InitilizeBadge(element);
+                    var newValue = (BadgeCollection)e.NewValue;
+
+                    newValue.HookupPlacementTarget(element);
                 }
+
+                UpdateElementBadgeAdorner(element);
             }
         }
 
-        public static object GetBadge(DependencyObject obj)
+        public static BadgeCollection GetBadges(DependencyObject obj)
         {
-            return obj.GetValue(BadgeProperty);
+            return (BadgeCollection)obj.GetValue(BadgesProperty);
         }
 
-        public static void SetBadge(DependencyObject obj, object value)
+        public static void SetBadges(DependencyObject obj, BadgeCollection value)
         {
-            obj.SetValue(BadgeProperty, value);
+            obj.SetValue(BadgesProperty, value);
         }
 
-        public static readonly DependencyProperty StyleProperty = DependencyProperty.RegisterAttached("Style", typeof(Style), typeof(BadgeService), new FrameworkPropertyMetadata(null, StylePropertyChanged));
-
-        private static void StylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is UIElement element)
-            {
-                if (TryGetElementBadge(element, out var badge))
-                {
-                    badge.Style = (Style)e.NewValue;
-                }
-            }
-        }
-
-        public static Style GetStyle(DependencyObject obj)
-        {
-            return (Style)obj.GetValue(StyleProperty);
-        }
-
-        public static void SetStyle(DependencyObject obj, Style value)
-        {
-            obj.SetValue(StyleProperty, value);
-        }
-
-        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(0d, OffsetPropertyChanged, CoerceOffsetProperty));
+        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(BadgeService), new FrameworkPropertyMetadata(1d, OffsetPropertyChanged, CoerceOffsetProperty));
 
         public static double GetHorizontalOffset(DependencyObject obj)
         {
@@ -173,7 +147,7 @@ namespace TestWPF
 
         private static void OffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateElementBadgeAdorner(d);
+            if (d is UIElement element) UpdateElementBadgeAdorner(element);
         }
 
         private static object CoerceOffsetProperty(DependencyObject d, object baseValue)
@@ -181,7 +155,7 @@ namespace TestWPF
             return CoerceOffset((double)baseValue);
         }
 
-        internal static double CoerceOffset(double offset)
+        private static double CoerceOffset(double offset)
         {
             if (offset > 1d) return 1d;
             if (offset < 0d) return 0;
@@ -189,66 +163,83 @@ namespace TestWPF
             return offset;
         }
 
-        private static bool TryGetElementBadge(UIElement element, out Badge badge)
+        private static void InitilizeBadgeAdorner(UIElement element, BadgeCollection badges)
         {
-            badge = null;
-
             var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+
+            if (adornerLayer == null) HookupDispatcherLoaded(element, badges);
+            else CreateBadgeAdorner(element, badges, adornerLayer);
+        }
+
+        private static void HookupDispatcherLoaded(UIElement element, BadgeCollection badges)
+        {
+            element.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+
+                if (adornerLayer != null) CreateBadgeAdorner(element, badges, adornerLayer);
+
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
+        }
+
+        private static void CreateBadgeAdorner(UIElement element, BadgeCollection badges, AdornerLayer adornerLayer)
+        {
+            var badgeAdorner = new BadgeAdorner(element, badges);
+
+            adornerLayer.Add(badgeAdorner);
+        }
+
+        private static bool TryGetBadgeAdorner(UIElement element, out BadgeAdorner badgeAdorner, out AdornerLayer adornerLayer)
+        {
+            badgeAdorner = null;
+
+            adornerLayer = AdornerLayer.GetAdornerLayer(element);
 
             if (adornerLayer != null)
             {
-                var elementAdorners = adornerLayer.GetAdorners(element);
+                var adorners = adornerLayer.GetAdorners(element);
 
-                var badgeAdorner = (BadgeAdorner)elementAdorners.FirstOrDefault(x => x is BadgeAdorner);
-
-                if (badgeAdorner != null)
+                if (adorners != null && adorners.Length > 0)
                 {
-                    badge = badgeAdorner.Badge;
-                    return true;
+                    badgeAdorner = adorners.OfType<BadgeAdorner>().FirstOrDefault();
+
+                    return badgeAdorner != null;
                 }
             }
 
             return false;
         }
 
-        private static void InitilizeBadge(UIElement element)
+        internal static void UpdateElementBadgeAdorner(UIElement element)
         {
-            var adornerLayer = AdornerLayer.GetAdornerLayer(element);
+            var badges = GetBadges(element);
 
-            if (adornerLayer == null) HookupLoaded(element);
-            else CreateBadge(element, adornerLayer);
-        }
+            var hasBadges = badges == null || badges.Count == 0;
 
-        private static void HookupLoaded(UIElement element)
-        {
-            element.Dispatcher.BeginInvoke(new Action(() =>
+            if (TryGetBadgeAdorner(element, out var badgeAdorner, out var adornerLayer))
             {
-                var adornerLayer = AdornerLayer.GetAdornerLayer(element);
-
-                if (adornerLayer != null) CreateBadge(element, adornerLayer);
-
-            }), System.Windows.Threading.DispatcherPriority.Loaded);
-        }
-
-        private static void CreateBadge(UIElement element, AdornerLayer adornerLayer)
-        {
-            var badge = new Badge(element);
-
-            var badgeAdorner = new BadgeAdorner(element, badge);
-
-            adornerLayer.Add(badgeAdorner);
-        }
-
-        internal static void UpdateElementBadgeAdorner(DependencyObject obj)
-        {
-            if (obj is UIElement element && GetBadge(obj) != null)
-            {
-                var adornerLayer = AdornerLayer.GetAdornerLayer(element);
-
-                if (adornerLayer != null && adornerLayer.GetAdorners(element).Length > 0)
+                if (hasBadges)
                 {
-                    adornerLayer?.Update(element);
+                    if (badgeAdorner.Badges != badges)
+                    {
+                        badgeAdorner.Unhook();
+                        badgeAdorner.Hookup(badges);
+                        adornerLayer.Update(element);
+                    }
+                    else
+                    {
+                        adornerLayer.Update(element);
+                    }
                 }
+                else
+                {
+                    badgeAdorner.Unhook();
+                    adornerLayer.Remove(badgeAdorner);
+                }
+            }
+            else
+            {
+                if (hasBadges) InitilizeBadgeAdorner(element, badges);
             }
         }
     }

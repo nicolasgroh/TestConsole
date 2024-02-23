@@ -126,7 +126,7 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            BadgeService.SetBadge(TestButton, "Test");
+            
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
