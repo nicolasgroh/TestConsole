@@ -43,7 +43,7 @@ namespace TestWPF
                 }
             }
 
-            ItemsHostChanged?.Invoke(this, new BadgeCollectionItemsHostChangedEventArgs(oldValue, newValue));
+            ItemsHostChanged?.Invoke(this, new GenericPropertyChangedEventArgs<Panel>(oldValue, newValue));
         }
 
         internal Panel GetItemsHost()
@@ -51,7 +51,7 @@ namespace TestWPF
             return _itemsHost;
         }
 
-        internal event EventHandler<BadgeCollectionItemsHostChangedEventArgs> ItemsHostChanged;
+        internal event GenericPropertyChangedEventHandler<BadgeCollection, Panel> ItemsHostChanged;
 
         protected override void InsertItem(int index, Badge item)
         {
@@ -89,21 +89,5 @@ namespace TestWPF
         {
             _placementTarget = null;
         }
-    }
-
-    public class BadgeCollectionItemsHostChangedEventArgs : EventArgs
-    {
-        public BadgeCollectionItemsHostChangedEventArgs(Panel oldValue,  Panel newValue)
-        {
-            _oldValue = oldValue;
-            _newValue = newValue;
-        }
-
-        private readonly Panel _oldValue;
-        private readonly Panel _newValue;
-
-        public Panel OldValue { get { return _oldValue; } }
-
-        public Panel NewValue { get { return _newValue; } }
     }
 }

@@ -36,44 +36,6 @@ namespace TestWPF
             return (-eps < delta) && (eps > delta);
         }
 
-        public static void ShowBalloonTip(this UIElement element, string text)
-        {
-            BeakedBorder balloon;
-
-            var popupAdorner = new PopupAdorner(element)
-            {
-                PlacementMode = PopupAdornerPlacementMode.Top,
-                Child = balloon = new BeakedBorder()
-                {
-                    Child = new TextBlock()
-                    {
-                        Text = text,
-                        Margin = new Thickness(5, 2, 5, 2)
-                    }
-                }
-            };
-
-            balloon.SetBinding(BeakedBorder.BeakDirectionProperty, new Binding("PlacementMode") { Source = popupAdorner, Converter = new PopupPlacementToBeakDirectionConverter() });
-
-            var adornerLayer = AdornerLayer.GetAdornerLayer(element);
-
-            var timer = new DispatcherTimer()
-            {
-                Interval = TimeSpan.FromSeconds(5)
-            };
-
-            timer.Tick += (s, e) =>
-            {
-                timer.Stop();
-
-                adornerLayer?.Remove(popupAdorner);
-            };
-
-            adornerLayer?.Add(popupAdorner);
-
-            timer.Start();
-        }
-
         public static T GetParentOfType<T>(this DependencyObject element)
         {
             DependencyObject parent;

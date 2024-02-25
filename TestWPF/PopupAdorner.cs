@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,7 +88,15 @@ namespace TestWPF
             set { SetValue(DynamicPlacementModeStrategyProperty, value); }
         }
 
-        private static readonly DependencyPropertyKey ComputedPlacementModePropertyKey = DependencyProperty.RegisterReadOnly("ComputedPlacementMode", typeof(PopupAdornerPlacementMode), typeof(PopupAdorner), new PropertyMetadata(PopupAdornerPlacementMode.Relative));
+        private static readonly DependencyPropertyKey ComputedPlacementModePropertyKey = DependencyProperty.RegisterReadOnly("ComputedPlacementMode", typeof(PopupAdornerPlacementMode), typeof(PopupAdorner), new FrameworkPropertyMetadata(PopupAdornerPlacementMode.Relative, ComputedPlacementModePropertyChanged));
+
+        public static readonly DependencyProperty ComputedPlacementModeProperty = ComputedPlacementModePropertyKey.DependencyProperty;
+
+        private static void ComputedPlacementModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((PopupAdorner)d).OnComputedPlacementModeChanged((PopupAdornerPlacementMode)e.OldValue, (PopupAdornerPlacementMode)e.NewValue);
+        }
+
         public PopupAdornerPlacementMode ComputedPlacementMode
         {
             get { return (PopupAdornerPlacementMode)GetValue(ComputedPlacementModePropertyKey.DependencyProperty); }
@@ -124,6 +133,10 @@ namespace TestWPF
         private double _offsetY = 0;
         #endregion
 
+        #region Events
+        public event GenericPropertyChangedEventHandler<PopupAdorner, PopupAdornerPlacementMode> ComputedPlacementModeChanged;
+        #endregion
+        
         #region Overrides
         protected override Size ArrangeOverride(Size arrangeSize)
         {
@@ -458,6 +471,11 @@ namespace TestWPF
 
             // Sould never happen
             return default;
+        }
+
+        private void OnComputedPlacementModeChanged(PopupAdornerPlacementMode oldValue, PopupAdornerPlacementMode newValue)
+        {
+            ComputedPlacementModeChanged?.Invoke(this, new GenericPropertyChangedEventArgs<PopupAdornerPlacementMode>(oldValue, newValue));
         }
         #endregion
     }

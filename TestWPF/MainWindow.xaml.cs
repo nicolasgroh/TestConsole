@@ -126,7 +126,7 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            UpToDateBadge.Content = "Halloooo!";
+            TestThumb.ShowBalloonTip("Hallooooo!", "Header");
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)

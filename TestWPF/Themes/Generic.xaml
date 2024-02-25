@@ -336,39 +336,6 @@
     <Style TargetType="{x:Type local:PopupAdorner}">
     </Style>
 
-    <Style TargetType="{x:Type local:BeakedBorder}">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="TextElement.Foreground" Value="Black"/>
-        <Setter Property="CornerRadius" Value="2"/>
-        <Setter Property="BeakWidth" Value="15"/>
-        <Setter Property="BeakLenght" Value="10"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="BorderBrush" Value="#6E3164"/>
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect BlurRadius="2" ShadowDepth="0" Direction="270" RenderingBias="Performance" Color="#CCCCCC"/>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="BeakDirection" Value="TopLeft">
-                <Setter Property="BeakWidth" Value="10"/>
-                <Setter Property="BeakLenght" Value="15"/>
-            </Trigger>
-            <Trigger Property="BeakDirection" Value="TopRight">
-                <Setter Property="BeakWidth" Value="10"/>
-                <Setter Property="BeakLenght" Value="15"/>
-            </Trigger>
-            <Trigger Property="BeakDirection" Value="BottomRight">
-                <Setter Property="BeakWidth" Value="10"/>
-                <Setter Property="BeakLenght" Value="15"/>
-            </Trigger>
-            <Trigger Property="BeakDirection" Value="BottomLeft">
-                <Setter Property="BeakWidth" Value="10"/>
-                <Setter Property="BeakLenght" Value="15"/>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
     <Style TargetType="{x:Type local:BeakedBorder}" x:Key="AsanaBeakStyle">
         <Setter Property="Background" Value="#424244"/>
         <Setter Property="TextElement.Foreground" Value="#dddcdb"/>
@@ -423,6 +390,99 @@
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
                         <ContentPresenter Margin="{TemplateBinding Padding}"/>
                     </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:BalloonTip}">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="#6E3164"/>
+        <Setter Property="Padding" Value="12 8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:BalloonTip}">
+                    <Grid>
+                        <local:BeakedBorder x:Name="DropShadowBorder" Background="#CCCCCC" BorderBrush="#CCCCCC" BorderThickness="{TemplateBinding BorderThickness}" BeakWidth="15" BeakLenght="10" CornerRadius="2">
+                            <local:BeakedBorder.Effect>
+                                <DropShadowEffect BlurRadius="2" ShadowDepth="0" Direction="270" RenderingBias="Performance" Color="#CCCCCC"/>
+                            </local:BeakedBorder.Effect>
+                        </local:BeakedBorder>
+                        <local:BeakedBorder x:Name="DisplayBeakedBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" BeakWidth="15" BeakLenght="10">
+                            <DockPanel Margin="{TemplateBinding Padding}">
+                                <ContentPresenter DockPanel.Dock="Top" ContentSource="Header" TextElement.FontWeight="Bold"/>
+                                <ContentPresenter x:Name="ContentPresenter"/>
+                            </DockPanel>
+                        </local:BeakedBorder>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="HasHeader" Value="True"/>
+                                <Condition Property="HasContent" Value="True"/>
+                            </MultiTrigger.Conditions>
+
+                            <Setter TargetName="ContentPresenter" Property="Margin" Value="0 5 0 0"/>
+                        </MultiTrigger>
+                        
+                        <Trigger Property="ComputedPlacementMode" Value="Left">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="Right"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="Right"/>
+                            <Setter Property="Margin" Value="0 0 2 0"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="Top">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="Bottom"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="Bottom"/>
+                            <Setter Property="Margin" Value="0 0 0 2"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="Right">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="Left"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="Left"/>
+                            <Setter Property="Margin" Value="2 0 0 0"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="Bottom">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="Top"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="Top"/>
+                            <Setter Property="Margin" Value="0 2 0 0"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="TopLeft">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="BottomRight"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="BottomRight"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakLenght" Value="15"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakLenght" Value="15"/>
+                            <Setter Property="Margin" Value="0 0 2 2"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="TopRight">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="BottomLeft"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="BottomLeft"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakLenght" Value="15"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakLenght" Value="15"/>
+                            <Setter Property="Margin" Value="2 0 0 2"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="BottomRight">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="TopLeft"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="TopLeft"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakLenght" Value="15"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakLenght" Value="15"/>
+                            <Setter Property="Margin" Value="2 2 0 0"/>
+                        </Trigger>
+                        <Trigger Property="ComputedPlacementMode" Value="BottomLeft">
+                            <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="TopRight"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="TopRight"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DropShadowBorder" Property="BeakLenght" Value="15"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakWidth" Value="10"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="BeakLenght" Value="15"/>
+                            <Setter Property="Margin" Value="0 2 2 0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

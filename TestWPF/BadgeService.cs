@@ -43,7 +43,7 @@ namespace TestWPF
                 _badges = null;
             }
 
-            private void Badges_ItemsHostChanged(object sender, BadgeCollectionItemsHostChangedEventArgs e)
+            private void Badges_ItemsHostChanged(BadgeCollection sender, GenericPropertyChangedEventArgs<Panel> e)
             {
                 Child = e.NewValue;
             }
