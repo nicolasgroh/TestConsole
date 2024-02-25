@@ -20,7 +20,6 @@ namespace TestWPF
         public T OldValue { get { return _oldValue; } }
 
         private T _newValue;
-
         public T NewValue { get { return _newValue; } }
     }
 }
