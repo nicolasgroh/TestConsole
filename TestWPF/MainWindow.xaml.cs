@@ -126,7 +126,7 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            
+            UpToDateBadge.Content = "Halloooo!";
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
@@ -138,14 +138,14 @@ namespace TestWPF
 
             if (double.IsNaN(left)) left = 0;
             if (double.IsNaN(top)) top = 0;
-            
+
             Canvas.SetLeft(thumb, left + e.HorizontalChange);
             Canvas.SetTop(thumb, top + e.VerticalChange);
         }
 
         private void RootBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            
+
         }
     }
 }

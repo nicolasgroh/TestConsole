@@ -18,17 +18,16 @@ namespace TestWPF
         {
             public BadgeAdorner(UIElement adornedElement, BadgeCollection badges) : base(adornedElement)
             {
-                Hookup(badges);
+                HookupBadges(badges);
             }
 
             BadgeCollection _badges;
-
             public BadgeCollection Badges
             {
                 get { return _badges; }
             }
 
-            public void Hookup(BadgeCollection badges)
+            public void HookupBadges(BadgeCollection badges)
             {
                 _badges = badges;
 
@@ -37,7 +36,7 @@ namespace TestWPF
                 _badges.ItemsHostChanged += Badges_ItemsHostChanged;
             }
 
-            public void Unhook()
+            public void UnhookBadges()
             {
                 Child = null;
                 _badges.ItemsHostChanged -= Badges_ItemsHostChanged;
@@ -107,7 +106,7 @@ namespace TestWPF
                     newValue.HookupPlacementTarget(element);
                 }
 
-                UpdateElementBadgeAdorner(element);
+                UpdateElementBadges(element);
             }
         }
 
@@ -147,7 +146,7 @@ namespace TestWPF
 
         private static void OffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is UIElement element) UpdateElementBadgeAdorner(element);
+            if (d is UIElement element) UpdateElementBadges(element);
         }
 
         private static object CoerceOffsetProperty(DependencyObject d, object baseValue)
@@ -175,9 +174,10 @@ namespace TestWPF
         {
             element.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var adornerLayer = AdornerLayer.GetAdornerLayer(element);
-
-                if (adornerLayer != null) CreateBadgeAdorner(element, badges, adornerLayer);
+                if (!TryGetBadgeAdorner(element, out var badgeAdorner, out var adornerLayer))
+                {
+                    if (adornerLayer != null) CreateBadgeAdorner(element, badges, adornerLayer);
+                }
 
             }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
@@ -210,30 +210,41 @@ namespace TestWPF
             return false;
         }
 
-        internal static void UpdateElementBadgeAdorner(UIElement element)
+        private static BadgeCollection GetBadges(UIElement element, out bool isDefault)
         {
-            var badges = GetBadges(element);
+            var valueSource = DependencyPropertyHelper.GetValueSource(element, BadgesProperty);
 
-            var hasBadges = badges == null || badges.Count == 0;
+            isDefault = valueSource.BaseValueSource == BaseValueSource.Default;
+
+            return GetBadges(element);
+        }
+
+        internal static void UpdateElementBadges(UIElement element)
+        {
+            var badges = GetBadges(element, out var isDefault);
+
+            if (isDefault) badges.HookupPlacementTarget(element);
+
+            var hasBadges = badges != null && badges.Count > 0;
 
             if (TryGetBadgeAdorner(element, out var badgeAdorner, out var adornerLayer))
             {
                 if (hasBadges)
                 {
-                    if (badgeAdorner.Badges != badges)
+                    if (badgeAdorner.Badges == badges)
                     {
-                        badgeAdorner.Unhook();
-                        badgeAdorner.Hookup(badges);
                         adornerLayer.Update(element);
                     }
                     else
                     {
+                        badgeAdorner.UnhookBadges();
+                        badgeAdorner.HookupBadges(badges);
                         adornerLayer.Update(element);
                     }
                 }
                 else
                 {
-                    badgeAdorner.Unhook();
+                    badgeAdorner.UnhookBadges();
                     adornerLayer.Remove(badgeAdorner);
                 }
             }

@@ -11,13 +11,8 @@ using System.Windows.Data;
 
 namespace TestWPF
 {
-    public class BadgeCollection : DependencyObject, ICollection<Badge>
+    public class BadgeCollection : Collection<Badge>
     {
-        public BadgeCollection()
-        {
-            items = new List<Badge>();
-        }
-
         private UIElement _placementTarget;
 
         private Panel _itemsHost;
@@ -42,9 +37,9 @@ namespace TestWPF
             {
                 newValue.Children.Clear();
 
-                for (int i = 0; i < items.Count; i++)
+                for (int i = 0; i < Items.Count; i++)
                 {
-                    newValue.Children.Add(items[i]);
+                    newValue.Children.Add(Items[i]);
                 }
             }
 
@@ -58,95 +53,31 @@ namespace TestWPF
 
         internal event EventHandler<BadgeCollectionItemsHostChangedEventArgs> ItemsHostChanged;
 
-        #region ICollection
-        private readonly List<Badge> items;
-
-        public int Count => items.Count;
-
-        public bool IsReadOnly => false;
-
-        public void Add(Badge item)
+        protected override void InsertItem(int index, Badge item)
         {
-            int index = items.Count;
-
-            InsertItem(index, item);
-        }
-
-        public void Clear()
-        {
-            ClearItems();
-        }
-
-        public void CopyTo(Badge[] array, int index)
-        {
-            items.CopyTo(array, index);
-        }
-
-        public bool Contains(Badge item)
-        {
-            return items.Contains(item);
-        }
-
-        public IEnumerator<Badge> GetEnumerator()
-        {
-            return items.GetEnumerator();
-        }
-
-        public void Insert(int index, Badge item)
-        {
-            if ((uint)index > (uint)items.Count) throw new ArgumentOutOfRangeException(nameof(index));
-
-            InsertItem(index, item);
-        }
-
-        public bool Remove(Badge item)
-        {
-            int index = items.IndexOf(item);
-
-            if (index < 0) return false;
-
-            RemoveItem(index);
-            return true;
-        }
-
-        public void RemoveAt(int index)
-        {
-            if ((uint)index >= (uint)items.Count) throw new ArgumentOutOfRangeException(nameof(index));
-
-            RemoveItem(index);
-        }
-        #endregion
-
-        private void ClearItems()
-        {
-            items.Clear();
-
-            _itemsHost?.Children.Clear();
-
-            if (_placementTarget != null) BadgeService.UpdateElementBadgeAdorner(_placementTarget);
-        }
-
-        private void InsertItem(int index, Badge item)
-        {
-            items.Insert(index, item);
+            base.InsertItem(index, item);
 
             _itemsHost?.Children.Insert(index, item);
 
-            if (_placementTarget != null) BadgeService.UpdateElementBadgeAdorner(_placementTarget);
+            if (_placementTarget != null) BadgeService.UpdateElementBadges(_placementTarget);
         }
 
-        private void RemoveItem(int index)
+        protected override void RemoveItem(int index)
         {
-            items.RemoveAt(index);
+            base.RemoveItem(index);
 
             _itemsHost?.Children.RemoveAt(index);
 
-            if (_placementTarget != null) BadgeService.UpdateElementBadgeAdorner(_placementTarget);
+            if (_placementTarget != null) BadgeService.UpdateElementBadges(_placementTarget);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        protected override void SetItem(int index, Badge item)
         {
-            return ((IEnumerable)items).GetEnumerator();
+            base.SetItem(index, item);
+
+            _itemsHost?.Children.RemoveAt(index);
+
+            _itemsHost?.Children.Insert(index, item);
         }
 
         internal void HookupPlacementTarget(UIElement placementTarget)

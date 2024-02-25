@@ -11,7 +11,7 @@
         d:DesignHeight="800"
         Width="800">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="20" ResizeBorderThickness="10" GlassFrameThickness="10"/>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="10" GlassFrameThickness="10"/>
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <local:PopupPlacementToBeakDirectionConverter x:Key="PopupPlacementToBeakDirectionConverter"/>
@@ -89,9 +89,10 @@
         </local:PopupAdornerDefinition>
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="100" Width="100" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100">
+            <Thumb x:Name="TestThumb" Height="100" Width="150" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:BadgeService.VerticalOffset="1">
                 <local:BadgeService.Badges>
-                    <local:Badge Content="Up to date"/>
+                    <local:Badge x:Name="UpToDateBadge" Content="Up to date" Margin="0 0 5 5"/>
+                    <local:Badge Content="Test" HorizontalAlignment="Right" Margin="0 0 5 5" Style="{StaticResource GreenBadge}"/>
                 </local:BadgeService.Badges>
             </Thumb>
         </Canvas>
