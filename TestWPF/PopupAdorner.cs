@@ -58,7 +58,7 @@ namespace TestWPF
 
         private static void PlacementModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((PopupAdorner)d)._computationPlacementMode = (PopupAdornerPlacementMode)e.NewValue;
+            ((PopupAdorner)d).ResetDynamicPlacement();
         }
 
         public PopupAdornerPlacementMode PlacementMode
