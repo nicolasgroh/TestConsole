@@ -170,6 +170,8 @@ namespace TestWPF
             public CornerRadius CornerRadius;
             public double RectangleOffsetX;
             public double RectangleOffsetY;
+            public double DiagonalArrowInset;
+            public double DiagonalArrowTipOffset;
         }
 
         private enum LineType
@@ -198,17 +200,17 @@ namespace TestWPF
         {
             base.OnRender(drawingContext);
 
-            var width = 60d;
-            var height = 30d;
+            var width = 80d;
+            var height = 40d;
 
-            var arrowWidth = 10d;
+            var arrowWidth = 5d;
             var arrowLength = 15d;
 
-            var borderThickness = new Thickness(2);
+            var borderThickness = new Thickness(2, 3, 2, 2);
 
             var cornerRadius = new CornerRadius(5);
 
-            var direction = BeakDirection.Top;
+            var direction = BeakDirection.Left;
 
             _geometryInfo = new GeometryInfo
             {
@@ -220,7 +222,7 @@ namespace TestWPF
                 CornerRadius = cornerRadius,
             };
 
-            CalculateRectangleOffsets(out _geometryInfo.RectangleOffsetX, out _geometryInfo.RectangleOffsetY);
+            CalculateRectangleOffsets(out _geometryInfo.RectangleOffsetX, out _geometryInfo.RectangleOffsetY, out _geometryInfo.DiagonalArrowInset, out _geometryInfo.DiagonalArrowTipOffset);
 
             var pointsCount = CalculatePointsCount();
 
@@ -322,13 +324,35 @@ namespace TestWPF
             return pointsCount;
         }
 
-        private void CalculateRectangleOffsets(out double offsetX, out double offsetY)
+        private void CalculateRectangleOffsets(out double offsetX, out double offsetY, out double diagonalArrowInset, out double diagonalArrowTipOffset)
         {
-            offsetX = 0;
-            offsetY = 0;
+            offsetX = 0d;
+            offsetY = 0d;
+            diagonalArrowInset = 0d;
+            diagonalArrowTipOffset = 0d;
 
             if (_geometryInfo.BeakDirection == BeakDirection.Left) offsetX = _geometryInfo.ArrowLength;
             if (_geometryInfo.BeakDirection == BeakDirection.Top) offsetY = _geometryInfo.ArrowLength;
+            if ((_geometryInfo.BeakDirection & BeakDirection.Diagonal) > 0)
+            {
+                diagonalArrowInset = Math.Sqrt(Math.Pow(_geometryInfo.ArrowWidth, 2d) * 2d);
+
+                diagonalArrowTipOffset = Math.Sqrt(Math.Pow(_geometryInfo.ArrowLength, 2d) / 2d);
+
+                switch (_geometryInfo.BeakDirection)
+                {
+                    case BeakDirection.TopLeft:
+                        offsetX = diagonalArrowTipOffset - (diagonalArrowInset / 2d);
+                        offsetY = diagonalArrowTipOffset - (diagonalArrowInset / 2d);
+                        break;
+                    case BeakDirection.BottomLeft:
+                        offsetX = diagonalArrowTipOffset - (diagonalArrowInset / 2d);
+                        break;
+                    case BeakDirection.TopRight:
+                        offsetY = diagonalArrowTipOffset - (diagonalArrowInset / 2d);
+                        break;
+                }
+            }
         }
 
         private void CreateGeometry(ref GeometryPoint[] points, Thickness borderThickness)
@@ -356,53 +380,68 @@ namespace TestWPF
             if (_geometryInfo.BeakDirection == BeakDirection.Left)
             {
                 var leftBorderMidPoint = new Point(bottomLeft.X, VerticalMidPoint(_geometryInfo.RectangleHeight, borderThickness));
-
+                
                 CreateStraightArrow(ref points, ref pointIndex, _geometryInfo.ArrowWidth, _geometryInfo.ArrowLength, _geometryInfo.BeakDirection, leftBorderMidPoint, borderThickness.Bottom);
             }
 
             // Ecke oben links
-            var topLeft = new Point(borderThickness.Left + _geometryInfo.RectangleOffsetX, borderThickness.Top + _geometryInfo.RectangleOffsetY);
+            var topLeft = new Point(_geometryInfo.RectangleOffsetX, _geometryInfo.RectangleOffsetY);
 
             if (_geometryInfo.BeakDirection == BeakDirection.TopLeft)
             {
-                var diagonalArrowInset = Math.Sqrt(Math.Pow(_geometryInfo.ArrowWidth, 2) * 2);
+                var arrowMidPoint = topLeft;
+                arrowMidPoint.Offset(_geometryInfo.DiagonalArrowInset / 2d, _geometryInfo.DiagonalArrowInset / 2d);
 
                 var arrowStart = topLeft;
-                arrowStart.Offset(0d, diagonalArrowInset);
+                arrowStart.Offset(0d, _geometryInfo.DiagonalArrowInset);
+
+                var arrowEnd = topLeft;
+                arrowEnd.Offset(_geometryInfo.DiagonalArrowInset, 0d);
 
                 double alpha = 0;
 
-                if (borderThickness.Left > 0 || borderThickness.Top > 0) alpha = CalculateAlpha(_geometryInfo.ArrowWidth / 2, _geometryInfo.ArrowLength);
+                if (borderThickness.Left > 0d || borderThickness.Top > 0d)
+                {
+                    var b = _geometryInfo.DiagonalArrowTipOffset - (_geometryInfo.DiagonalArrowInset / 2d);
+                    var a = b + _geometryInfo.DiagonalArrowInset;
+
+                    alpha = CalculateAlpha(a, b);
+                }
+
+                double leftAngleThicknessOffset = 0d;
 
                 if (borderThickness.Left > 0)
                 {
-                    var leftAngleThicknessOffset = CalculateAngleThicknessOffset(alpha, borderThickness.Left);
+                    leftAngleThicknessOffset = CalculateAngleThicknessOffset(alpha, borderThickness.Left);
 
-                    arrowStart.Offset(0d, -leftAngleThicknessOffset);
+                    arrowStart.Offset(borderThickness.Left, -leftAngleThicknessOffset);
                 }
 
-                var arrowTip = topLeft;
-                arrowTip.Offset(diagonalArrowInset, diagonalArrowInset);
-
-
-
-                var arrowEnd = topLeft;
-                arrowEnd.Offset(diagonalArrowInset, 0d);
+                double topAngleThicknessOffset = 0d;
 
                 if (borderThickness.Top > 0)
                 {
-                    var topAngleThicknessOffset = CalculateAngleThicknessOffset(alpha, borderThickness.Top);
+                    topAngleThicknessOffset = CalculateAngleThicknessOffset(alpha, borderThickness.Top);
 
-                    arrowEnd.Offset(-topAngleThicknessOffset, 0d);
+                    arrowEnd.Offset(-topAngleThicknessOffset, borderThickness.Top);
+                }
+
+                var arrowTip = arrowMidPoint;
+                arrowTip.Offset(-_geometryInfo.DiagonalArrowTipOffset, -_geometryInfo.DiagonalArrowTipOffset);
+
+                if (leftAngleThicknessOffset > 0d || topAngleThicknessOffset > 0d)
+                {
+                    arrowTip = CalculateIntersectionPoint(arrowStart, new Point(arrowTip.X + borderThickness.Left, arrowTip.Y - leftAngleThicknessOffset), arrowEnd, new Point(arrowTip.X - topAngleThicknessOffset, arrowTip.Y + borderThickness.Top));
                 }
 
                 points[pointIndex++] = new GeometryPoint(arrowStart, LineType.Line);
                 points[pointIndex++] = new GeometryPoint(arrowTip, LineType.Line);
-
                 points[pointIndex++] = new GeometryPoint(arrowEnd, LineType.Line);
             }
             else
             {
+                topLeft.Offset(borderThickness.Left, borderThickness.Top);
+
                 if (_geometryInfo.CornerRadius.TopLeft > 0)
                 {
                     var arcSize = new Size(Math.Max(_geometryInfo.CornerRadius.TopLeft - borderThickness.Left, 0), Math.Max(_geometryInfo.CornerRadius.TopLeft - borderThickness.Top, 0));
@@ -480,14 +519,28 @@ namespace TestWPF
 
         private double CalculateAlpha(double a, double b)
         {
-            var c = Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
+            var c = Math.Sqrt(Math.Pow(a, 2d) + Math.Pow(b, 2d));
 
             return Math.Asin(a / c);
         }
 
         private double CalculateAngleThicknessOffset(double angle, double thickness)
         {
-            return thickness * (1 - angle / (Math.PI / 2));
+            return thickness * (1 - angle / (Math.PI / 2d));
+        }
+
+        private Point CalculateIntersectionPoint(Point firstLineFirstPoint, Point firstLineSecondPoint, Point secondLineFirstPoint, Point secondLineSecondPoint)
+        {
+            var firstMultiplicationValue = firstLineFirstPoint.X * firstLineSecondPoint.Y - firstLineFirstPoint.Y * firstLineSecondPoint.X;
+            var secondMultiplicationValue = secondLineSecondPoint.X * secondLineFirstPoint.Y - secondLineSecondPoint.Y * secondLineFirstPoint.X;
+
+            var dvisionValue = (firstLineFirstPoint.X - firstLineSecondPoint.X) * (secondLineSecondPoint.Y - secondLineFirstPoint.Y) - (firstLineFirstPoint.Y - firstLineSecondPoint.Y) * (secondLineSecondPoint.X - secondLineFirstPoint.X);
+
+            var x = ((secondLineSecondPoint.X - secondLineFirstPoint.X) * firstMultiplicationValue - (firstLineFirstPoint.X - firstLineSecondPoint.X) * secondMultiplicationValue) / dvisionValue;
+
+            var y = ((secondLineSecondPoint.Y - secondLineFirstPoint.Y) * firstMultiplicationValue - (firstLineFirstPoint.Y - firstLineSecondPoint.Y) * secondMultiplicationValue) / dvisionValue;
+
+            return new Point(x, y);
         }
 
         #region StraightArrow
@@ -514,9 +567,7 @@ namespace TestWPF
 
         private void StraightArrowFromMidPoint(Point midPoint, BeakDirection direction, double arrowWidth, double arrowLength, out Point arrowStart, out Point arrowEnd, out Point arrowTip)
         {
-            var isHorizontal = direction == BeakDirection.Left || direction == BeakDirection.Right;
-
-            if (isHorizontal)
+            if ((direction & BeakDirection.StraightHorizontal) > 0)
             {
                 arrowStart = midPoint;
                 arrowStart.Offset(0d, -arrowWidth / 2);
