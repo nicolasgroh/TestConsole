@@ -41,6 +41,9 @@
             <Button Content="Test5"/>
             <Button Content="Test6"/>
             <Button Content="Test7"/>
+            <local:BeakedBorder Background="Green" CornerRadius="4" BeakDirection="BottomRight" Height="40" BorderThickness="2" BorderBrush="Gray">
+                <TextBlock Text="Hello" Margin="3 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </local:BeakedBorder>
         </local:TablePanel>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">
