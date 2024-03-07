@@ -26,12 +26,12 @@ namespace TestWPF
     {
         private struct GeometryInfo
         {
-            public double ArrowWidth;
-            public double ArrowLength;
+            public double BeakWidth;
+            public double BeakLength;
             public BeakDirection BeakDirection;
             public CornerRadius CornerRadius;
-            public double DiagonalArrowInset;
-            public double DiagonalArrowTipOffset;
+            public double DiagonalBeakInset;
+            public double DiagonalBeakTipOffset;
             public Rect ChildRectangle;
             public double DiagonalBeakChildRectangleOffset;
 
@@ -229,18 +229,18 @@ namespace TestWPF
         {
             _geometryInfo = new GeometryInfo
             {
-                ArrowWidth = BeakWidth,
-                ArrowLength = BeakLenght,
+                BeakWidth = BeakWidth,
+                BeakLength = BeakLenght,
                 BeakDirection = BeakDirection,
                 CornerRadius = CornerRadius
             };
 
             if (IsDiagonal())
             {
-                _geometryInfo.DiagonalArrowInset = Math.Sqrt(Math.Pow(_geometryInfo.ArrowWidth, 2d) / 2d);
-                _geometryInfo.DiagonalArrowTipOffset = Math.Sqrt(Math.Pow(_geometryInfo.ArrowLength, 2d) / 2d);
+                _geometryInfo.DiagonalBeakInset = Math.Sqrt(Math.Pow(_geometryInfo.BeakWidth, 2d) / 2d);
+                _geometryInfo.DiagonalBeakTipOffset = Math.Sqrt(Math.Pow(_geometryInfo.BeakLength, 2d) / 2d);
 
-                _geometryInfo.DiagonalBeakChildRectangleOffset = _geometryInfo.DiagonalArrowTipOffset - (_geometryInfo.DiagonalArrowInset / 2d);
+                _geometryInfo.DiagonalBeakChildRectangleOffset = _geometryInfo.DiagonalBeakTipOffset - (_geometryInfo.DiagonalBeakInset / 2d);
             }
 
             CalculateChildRectangle(constraint);
@@ -253,8 +253,8 @@ namespace TestWPF
             switch (_geometryInfo.BeakDirection)
             {
                 case BeakDirection.Left:
-                    childRectangle.Width -= _geometryInfo.ArrowLength;
-                    childRectangle.Offset(_geometryInfo.ArrowLength, 0d);
+                    childRectangle.Width -= _geometryInfo.BeakLength;
+                    childRectangle.Offset(_geometryInfo.BeakLength, 0d);
                     break;
                 case BeakDirection.TopLeft:
                     childRectangle.Width -= _geometryInfo.DiagonalBeakChildRectangleOffset;
@@ -262,8 +262,8 @@ namespace TestWPF
                     childRectangle.Offset(_geometryInfo.DiagonalBeakChildRectangleOffset, _geometryInfo.DiagonalBeakChildRectangleOffset);
                     break;
                 case BeakDirection.Top:
-                    childRectangle.Height -= _geometryInfo.ArrowLength;
-                    childRectangle.Offset(0d, _geometryInfo.ArrowLength);
+                    childRectangle.Height -= _geometryInfo.BeakLength;
+                    childRectangle.Offset(0d, _geometryInfo.BeakLength);
                     break;
                 case BeakDirection.TopRight:
                     childRectangle.Width -= _geometryInfo.DiagonalBeakChildRectangleOffset;
@@ -271,14 +271,14 @@ namespace TestWPF
                     childRectangle.Offset(0d, _geometryInfo.DiagonalBeakChildRectangleOffset);
                     break;
                 case BeakDirection.Right:
-                    childRectangle.Width -= _geometryInfo.ArrowLength;
+                    childRectangle.Width -= _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.BottomRight:
                     childRectangle.Width -= _geometryInfo.DiagonalBeakChildRectangleOffset;
                     childRectangle.Height -= _geometryInfo.DiagonalBeakChildRectangleOffset;
                     break;
                 case BeakDirection.Bottom:
-                    childRectangle.Height -= _geometryInfo.ArrowLength;
+                    childRectangle.Height -= _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.BottomLeft:
                     childRectangle.Width -= _geometryInfo.DiagonalBeakChildRectangleOffset;
@@ -305,28 +305,28 @@ namespace TestWPF
             switch (_geometryInfo.BeakDirection)
             {
                 case BeakDirection.Left:
-                    leftBeakHeight = _geometryInfo.ArrowWidth;
+                    leftBeakHeight = _geometryInfo.BeakWidth;
                     break;
                 case BeakDirection.TopLeft:
-                    topLeftCornerRadius = _geometryInfo.DiagonalArrowInset;
+                    topLeftCornerRadius = _geometryInfo.DiagonalBeakInset;
                     break;
                 case BeakDirection.Top:
-                    topBeakWidth = _geometryInfo.ArrowWidth;
+                    topBeakWidth = _geometryInfo.BeakWidth;
                     break;
                 case BeakDirection.TopRight:
-                    topRightCornerRadius = _geometryInfo.DiagonalArrowInset;
+                    topRightCornerRadius = _geometryInfo.DiagonalBeakInset;
                     break;
                 case BeakDirection.Right:
-                    rightBeakHeight = _geometryInfo.ArrowWidth;
+                    rightBeakHeight = _geometryInfo.BeakWidth;
                     break;
                 case BeakDirection.BottomRight:
-                    bottomRightCornerRadius = _geometryInfo.DiagonalArrowInset;
+                    bottomRightCornerRadius = _geometryInfo.DiagonalBeakInset;
                     break;
                 case BeakDirection.Bottom:
-                    bottomBeakWidth = _geometryInfo.ArrowWidth;
+                    bottomBeakWidth = _geometryInfo.BeakWidth;
                     break;
                 case BeakDirection.BottomLeft:
-                    bottomLeftCornerRadius = _geometryInfo.DiagonalArrowInset;
+                    bottomLeftCornerRadius = _geometryInfo.DiagonalBeakInset;
                     break;
             }
 
@@ -343,28 +343,28 @@ namespace TestWPF
             switch (_geometryInfo.BeakDirection)
             {
                 case BeakDirection.Left:
-                    totalSize.Width += _geometryInfo.ArrowLength;
+                    totalSize.Width += _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.TopLeft:
                     totalSize.Width += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     totalSize.Height += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     break;
                 case BeakDirection.Top:
-                    totalSize.Height += _geometryInfo.ArrowLength;
+                    totalSize.Height += _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.TopRight:
                     totalSize.Width += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     totalSize.Height += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     break;
                 case BeakDirection.Right:
-                    totalSize.Width += _geometryInfo.ArrowLength;
+                    totalSize.Width += _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.BottomRight:
                     totalSize.Width += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     totalSize.Height += _geometryInfo.DiagonalBeakChildRectangleOffset;
                     break;
                 case BeakDirection.Bottom:
-                    totalSize.Height += _geometryInfo.ArrowLength;
+                    totalSize.Height += _geometryInfo.BeakLength;
                     break;
                 case BeakDirection.BottomLeft:
                     totalSize.Width += _geometryInfo.DiagonalBeakChildRectangleOffset;
@@ -387,11 +387,11 @@ namespace TestWPF
 
             if (_geometryInfo.BeakDirection == BeakDirection.BottomLeft)
             {
-                CreateDiagonalArrow(bottomLeft, borderThickness.Bottom, borderThickness.Left, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateDiagonalBeak(bottomLeft, borderThickness.Bottom, borderThickness.Left, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
             else
             {
@@ -417,11 +417,11 @@ namespace TestWPF
             {
                 var leftBorderMidPoint = new Point(bottomLeft.X, VerticalMidPoint(borderThickness));
 
-                CreateStraightArrow(leftBorderMidPoint, borderThickness.Bottom, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateStraightBeak(leftBorderMidPoint, borderThickness.Bottom, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowEnd));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowStart));
+                points.Add(GeometryPoint.Line(beakEnd));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakStart));
             }
 
             // Ecke oben links
@@ -429,11 +429,11 @@ namespace TestWPF
 
             if (_geometryInfo.BeakDirection == BeakDirection.TopLeft)
             {
-                CreateDiagonalArrow(topLeft, borderThickness.Left, borderThickness.Top, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateDiagonalBeak(topLeft, borderThickness.Left, borderThickness.Top, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
             else
             {
@@ -459,11 +459,11 @@ namespace TestWPF
             {
                 var topBorderMidPoint = new Point(HorizontalMidPoint(borderThickness), topLeft.Y);
 
-                CreateStraightArrow(topBorderMidPoint, borderThickness.Bottom, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateStraightBeak(topBorderMidPoint, borderThickness.Bottom, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
 
             // Ecke oben rechts
@@ -471,11 +471,11 @@ namespace TestWPF
 
             if (_geometryInfo.BeakDirection == BeakDirection.TopRight)
             {
-                CreateDiagonalArrow(topRight, borderThickness.Top, borderThickness.Right, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateDiagonalBeak(topRight, borderThickness.Top, borderThickness.Right, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
             else
             {
@@ -501,11 +501,11 @@ namespace TestWPF
             {
                 var rightBorderMidPoint = new Point(topRight.X, VerticalMidPoint(borderThickness));
 
-                CreateStraightArrow(rightBorderMidPoint, borderThickness.Bottom, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateStraightBeak(rightBorderMidPoint, borderThickness.Bottom, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
 
             // Ecke unten rechts
@@ -513,11 +513,11 @@ namespace TestWPF
 
             if (_geometryInfo.BeakDirection == BeakDirection.BottomRight)
             {
-                CreateDiagonalArrow(bottomRight, borderThickness.Right, borderThickness.Bottom, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateDiagonalBeak(bottomRight, borderThickness.Right, borderThickness.Bottom, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowStart));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowEnd));
+                points.Add(GeometryPoint.Line(beakStart));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakEnd));
             }
             else
             {
@@ -544,11 +544,11 @@ namespace TestWPF
             {
                 var bottomBorderMidPoint = new Point(HorizontalMidPoint(borderThickness), bottomRight.Y);
 
-                CreateStraightArrow(bottomBorderMidPoint, borderThickness.Bottom, out var arrowStart, out var arrowEnd, out var arrowTip);
+                CreateStraightBeak(bottomBorderMidPoint, borderThickness.Bottom, out var beakStart, out var beakEnd, out var beakTip);
 
-                points.Add(GeometryPoint.Line(arrowEnd));
-                points.Add(GeometryPoint.Line(arrowTip));
-                points.Add(GeometryPoint.Line(arrowStart));
+                points.Add(GeometryPoint.Line(beakEnd));
+                points.Add(GeometryPoint.Line(beakTip));
+                points.Add(GeometryPoint.Line(beakStart));
             }
         }
 
@@ -588,7 +588,7 @@ namespace TestWPF
             return _geometryInfo.BeakDirection == BeakDirection.Left || _geometryInfo.BeakDirection == BeakDirection.Right;
         }
 
-        #region StraightArrow
+        #region StraightBeak
         private double HorizontalMidPoint(Thickness borderThickness)
         {
             return borderThickness.Left + (_geometryInfo.RectangleWidth - borderThickness.Left - borderThickness.Right) / 2 + _geometryInfo.RectangleOffsetX;
@@ -599,160 +599,160 @@ namespace TestWPF
             return borderThickness.Top + (_geometryInfo.RectangleHeight - borderThickness.Top - borderThickness.Bottom) / 2 + _geometryInfo.RectangleOffsetY;
         }
 
-        private void CreateStraightArrow(Point arrowMidPoint, double thickness, out Point arrowStart, out Point arrowEnd, out Point arrowTip)
+        private void CreateStraightBeak(Point beakMidPoint, double thickness, out Point beakStart, out Point beakEnd, out Point beakTip)
         {
-            StraightArrowFromMidPoint(arrowMidPoint, out arrowStart, out arrowEnd, out arrowTip);
+            StraightBeakFromMidPoint(beakMidPoint, out beakStart, out beakEnd, out beakTip);
 
-            if (thickness > 0.0) OffsetStraightArrowByThickness(thickness, ref arrowStart, ref arrowEnd, ref arrowTip);
+            if (thickness > 0.0) OffsetStraightBeakByThickness(thickness, ref beakStart, ref beakEnd, ref beakTip);
         }
 
-        private void StraightArrowFromMidPoint(Point midPoint, out Point arrowStart, out Point arrowEnd, out Point arrowTip)
+        private void StraightBeakFromMidPoint(Point midPoint, out Point beakStart, out Point beakEnd, out Point beakTip)
         {
             if (IsStraightHorizontal())
             {
-                arrowStart = midPoint;
-                arrowStart.Offset(0d, -_geometryInfo.ArrowWidth / 2);
+                beakStart = midPoint;
+                beakStart.Offset(0d, -_geometryInfo.BeakWidth / 2);
 
-                arrowEnd = arrowStart;
-                arrowEnd.Offset(0d, _geometryInfo.ArrowWidth);
+                beakEnd = beakStart;
+                beakEnd.Offset(0d, _geometryInfo.BeakWidth);
 
                 switch (_geometryInfo.BeakDirection)
                 {
                     case BeakDirection.Left:
-                        arrowTip = midPoint;
-                        arrowTip.Offset(-_geometryInfo.ArrowLength, 0d);
+                        beakTip = midPoint;
+                        beakTip.Offset(-_geometryInfo.BeakLength, 0d);
                         break;
                     case BeakDirection.Right:
-                        arrowTip = midPoint;
-                        arrowTip.Offset(_geometryInfo.ArrowLength, 0d);
+                        beakTip = midPoint;
+                        beakTip.Offset(_geometryInfo.BeakLength, 0d);
                         break;
                 }
             }
             else
             {
-                arrowStart = midPoint;
-                arrowStart.Offset(-_geometryInfo.ArrowWidth / 2, 0d);
+                beakStart = midPoint;
+                beakStart.Offset(-_geometryInfo.BeakWidth / 2, 0d);
 
-                arrowEnd = arrowStart;
-                arrowEnd.Offset(_geometryInfo.ArrowWidth, 0d);
+                beakEnd = beakStart;
+                beakEnd.Offset(_geometryInfo.BeakWidth, 0d);
 
                 switch (_geometryInfo.BeakDirection)
                 {
                     case BeakDirection.Top:
-                        arrowTip = midPoint;
-                        arrowTip.Offset(0d, -_geometryInfo.ArrowLength);
+                        beakTip = midPoint;
+                        beakTip.Offset(0d, -_geometryInfo.BeakLength);
                         break;
                     case BeakDirection.Bottom:
-                        arrowTip = midPoint;
-                        arrowTip.Offset(0d, _geometryInfo.ArrowLength);
+                        beakTip = midPoint;
+                        beakTip.Offset(0d, _geometryInfo.BeakLength);
                         break;
                 }
             }
         }
 
-        private void OffsetStraightArrowByThickness(double thickness, ref Point arrowStart, ref Point arrowEnd, ref Point arrowTip)
+        private void OffsetStraightBeakByThickness(double thickness, ref Point beakStart, ref Point beakEnd, ref Point beakTip)
         {
-            var alpha = CalculateAlpha(_geometryInfo.ArrowWidth / 2, _geometryInfo.ArrowLength);
+            var alpha = CalculateAlpha(_geometryInfo.BeakWidth / 2, _geometryInfo.BeakLength);
 
             var angleThicknessOffset = CalculateAngleThicknessOffset(alpha, thickness);
 
-            var tipThicknessOffset = CalculateStraightArrowTipThicknessOffset(alpha, thickness);
+            var tipThicknessOffset = CalculateStraightBeakTipThicknessOffset(alpha, thickness);
 
             var isHorizontal = _geometryInfo.BeakDirection == BeakDirection.Left || _geometryInfo.BeakDirection == BeakDirection.Right;
 
             if (isHorizontal)
             {
-                arrowStart.Offset(0d, angleThicknessOffset);
-                arrowEnd.Offset(0d, -angleThicknessOffset);
+                beakStart.Offset(0d, angleThicknessOffset);
+                beakEnd.Offset(0d, -angleThicknessOffset);
 
                 switch (_geometryInfo.BeakDirection)
                 {
                     case BeakDirection.Left:
-                        arrowTip.Offset(tipThicknessOffset - thickness, 0d);
+                        beakTip.Offset(tipThicknessOffset - thickness, 0d);
                         break;
                     case BeakDirection.Right:
-                        arrowTip.Offset(-(tipThicknessOffset - thickness), 0d);
+                        beakTip.Offset(-(tipThicknessOffset - thickness), 0d);
                         break;
                 }
             }
             else
             {
-                arrowStart.Offset(angleThicknessOffset, 0d);
-                arrowEnd.Offset(-angleThicknessOffset, 0d);
+                beakStart.Offset(angleThicknessOffset, 0d);
+                beakEnd.Offset(-angleThicknessOffset, 0d);
 
                 switch (_geometryInfo.BeakDirection)
                 {
                     case BeakDirection.Top:
-                        arrowTip.Offset(0d, tipThicknessOffset - thickness);
+                        beakTip.Offset(0d, tipThicknessOffset - thickness);
                         break;
                     case BeakDirection.Bottom:
-                        arrowTip.Offset(0d, -(tipThicknessOffset - thickness));
+                        beakTip.Offset(0d, -(tipThicknessOffset - thickness));
                         break;
                 }
             }
         }
 
-        private double CalculateStraightArrowTipThicknessOffset(double arrowStartAngle, double thickness)
+        private double CalculateStraightBeakTipThicknessOffset(double beakStartAngle, double thickness)
         {
-            return thickness / Math.Sin(arrowStartAngle);
+            return thickness / Math.Sin(beakStartAngle);
         }
         #endregion
 
-        #region DiagonalArrow
-        private void CreateDiagonalArrow(Point arrowCorner, double startThickness, double endThickness, out Point arrowStart, out Point arrowEnd, out Point arrowTip)
+        #region DiagonalBeak
+        private void CreateDiagonalBeak(Point beakCorner, double startThickness, double endThickness, out Point beakStart, out Point beakEnd, out Point beakTip)
         {
-            DiagonalArrowFromCornerPoint(arrowCorner, out arrowStart, out arrowTip, out arrowEnd);
+            DiagonalBeakFromCornerPoint(beakCorner, out beakStart, out beakTip, out beakEnd);
 
-            if (startThickness > 0d || endThickness > 0d) OffsetDiagonalArrowBythickness(startThickness, endThickness, ref arrowStart, ref arrowTip, ref arrowEnd);
+            if (startThickness > 0d || endThickness > 0d) OffsetDiagonalBeakBythickness(startThickness, endThickness, ref beakStart, ref beakTip, ref beakEnd);
         }
 
-        private void DiagonalArrowFromCornerPoint(Point arrowCorner, out Point arrowStart, out Point arrowTip, out Point arrowEnd)
+        private void DiagonalBeakFromCornerPoint(Point beakCorner, out Point beakStart, out Point beakTip, out Point beakEnd)
         {
-            arrowStart = arrowCorner;
-            arrowTip = arrowCorner;
-            arrowEnd = arrowCorner;
+            beakStart = beakCorner;
+            beakTip = beakCorner;
+            beakEnd = beakCorner;
 
             switch (_geometryInfo.BeakDirection)
             {
                 case BeakDirection.TopLeft:
-                    arrowStart.Offset(0d, _geometryInfo.DiagonalArrowInset);
+                    beakStart.Offset(0d, _geometryInfo.DiagonalBeakInset);
 
-                    arrowTip.Offset(_geometryInfo.DiagonalArrowInset / 2d, _geometryInfo.DiagonalArrowInset / 2d);
-                    arrowTip.Offset(-_geometryInfo.DiagonalArrowTipOffset, -_geometryInfo.DiagonalArrowTipOffset);
+                    beakTip.Offset(_geometryInfo.DiagonalBeakInset / 2d, _geometryInfo.DiagonalBeakInset / 2d);
+                    beakTip.Offset(-_geometryInfo.DiagonalBeakTipOffset, -_geometryInfo.DiagonalBeakTipOffset);
 
-                    arrowEnd.Offset(_geometryInfo.DiagonalArrowInset, 0d);
+                    beakEnd.Offset(_geometryInfo.DiagonalBeakInset, 0d);
                     break;
                 case BeakDirection.TopRight:
-                    arrowStart.Offset(-_geometryInfo.DiagonalArrowInset, 0d);
+                    beakStart.Offset(-_geometryInfo.DiagonalBeakInset, 0d);
 
-                    arrowTip.Offset(-_geometryInfo.DiagonalArrowInset / 2d, _geometryInfo.DiagonalArrowInset / 2d);
-                    arrowTip.Offset(_geometryInfo.DiagonalArrowTipOffset, -_geometryInfo.DiagonalArrowTipOffset);
+                    beakTip.Offset(-_geometryInfo.DiagonalBeakInset / 2d, _geometryInfo.DiagonalBeakInset / 2d);
+                    beakTip.Offset(_geometryInfo.DiagonalBeakTipOffset, -_geometryInfo.DiagonalBeakTipOffset);
 
-                    arrowEnd.Offset(0d, _geometryInfo.DiagonalArrowInset);
+                    beakEnd.Offset(0d, _geometryInfo.DiagonalBeakInset);
                     break;
                 case BeakDirection.BottomRight:
-                    arrowStart.Offset(0d, -_geometryInfo.DiagonalArrowInset);
+                    beakStart.Offset(0d, -_geometryInfo.DiagonalBeakInset);
 
-                    arrowTip.Offset(-_geometryInfo.DiagonalArrowInset / 2d, -_geometryInfo.DiagonalArrowInset / 2d);
-                    arrowTip.Offset(_geometryInfo.DiagonalArrowTipOffset, _geometryInfo.DiagonalArrowTipOffset);
+                    beakTip.Offset(-_geometryInfo.DiagonalBeakInset / 2d, -_geometryInfo.DiagonalBeakInset / 2d);
+                    beakTip.Offset(_geometryInfo.DiagonalBeakTipOffset, _geometryInfo.DiagonalBeakTipOffset);
 
-                    arrowEnd.Offset(-_geometryInfo.DiagonalArrowInset, 0d);
+                    beakEnd.Offset(-_geometryInfo.DiagonalBeakInset, 0d);
                     break;
                 case BeakDirection.BottomLeft:
-                    arrowStart.Offset(_geometryInfo.DiagonalArrowInset, 0d);
+                    beakStart.Offset(_geometryInfo.DiagonalBeakInset, 0d);
 
-                    arrowTip.Offset(_geometryInfo.DiagonalArrowInset / 2d, -_geometryInfo.DiagonalArrowInset / 2d);
-                    arrowTip.Offset(-_geometryInfo.DiagonalArrowTipOffset, _geometryInfo.DiagonalArrowTipOffset);
+                    beakTip.Offset(_geometryInfo.DiagonalBeakInset / 2d, -_geometryInfo.DiagonalBeakInset / 2d);
+                    beakTip.Offset(-_geometryInfo.DiagonalBeakTipOffset, _geometryInfo.DiagonalBeakTipOffset);
 
-                    arrowEnd.Offset(0d, -_geometryInfo.DiagonalArrowInset);
+                    beakEnd.Offset(0d, -_geometryInfo.DiagonalBeakInset);
                     break;
             }
         }
 
-        private void OffsetDiagonalArrowBythickness(double startThickness, double endThickness, ref Point arrowStart, ref Point arrowTip, ref Point arrowEnd)
+        private void OffsetDiagonalBeakBythickness(double startThickness, double endThickness, ref Point beakStart, ref Point beakTip, ref Point beakEnd)
         {
-            var b = _geometryInfo.DiagonalArrowTipOffset - (_geometryInfo.DiagonalArrowInset / 2d);
-            var a = b + _geometryInfo.DiagonalArrowInset;
+            var b = _geometryInfo.DiagonalBeakTipOffset - (_geometryInfo.DiagonalBeakInset / 2d);
+            var a = b + _geometryInfo.DiagonalBeakInset;
 
             var alpha = CalculateAlpha(a, b);
 
@@ -767,32 +767,32 @@ namespace TestWPF
             switch (_geometryInfo.BeakDirection)
             {
                 case BeakDirection.TopLeft:
-                    arrowStart.Offset(startThickness, -startAngleThicknessOffset);
+                    beakStart.Offset(startThickness, -startAngleThicknessOffset);
 
-                    arrowEnd.Offset(-endAngleThicknessOffset, endThickness);
+                    beakEnd.Offset(-endAngleThicknessOffset, endThickness);
 
-                    arrowTip = CalculateIntersectionPoint(arrowStart, new Point(arrowTip.X + startThickness, arrowTip.Y - startAngleThicknessOffset), arrowEnd, new Point(arrowTip.X - endAngleThicknessOffset, arrowTip.Y + endThickness));
+                    beakTip = CalculateIntersectionPoint(beakStart, new Point(beakTip.X + startThickness, beakTip.Y - startAngleThicknessOffset), beakEnd, new Point(beakTip.X - endAngleThicknessOffset, beakTip.Y + endThickness));
                     break;
                 case BeakDirection.TopRight:
-                    arrowStart.Offset(startAngleThicknessOffset, startThickness);
+                    beakStart.Offset(startAngleThicknessOffset, startThickness);
 
-                    arrowEnd.Offset(-endThickness, -endAngleThicknessOffset);
+                    beakEnd.Offset(-endThickness, -endAngleThicknessOffset);
 
-                    arrowTip = CalculateIntersectionPoint(arrowStart, new Point(arrowTip.X + startAngleThicknessOffset, arrowTip.Y + startThickness), arrowEnd, new Point(arrowTip.X - endThickness, arrowTip.Y - endAngleThicknessOffset));
+                    beakTip = CalculateIntersectionPoint(beakStart, new Point(beakTip.X + startAngleThicknessOffset, beakTip.Y + startThickness), beakEnd, new Point(beakTip.X - endThickness, beakTip.Y - endAngleThicknessOffset));
                     break;
                 case BeakDirection.BottomRight:
-                    arrowStart.Offset(-startThickness, startAngleThicknessOffset);
+                    beakStart.Offset(-startThickness, startAngleThicknessOffset);
 
-                    arrowEnd.Offset(endAngleThicknessOffset, -endThickness);
+                    beakEnd.Offset(endAngleThicknessOffset, -endThickness);
 
-                    arrowTip = CalculateIntersectionPoint(arrowStart, new Point(arrowTip.X - startThickness, arrowTip.Y + startAngleThicknessOffset), arrowEnd, new Point(arrowTip.X + endAngleThicknessOffset, arrowTip.Y - endThickness));
+                    beakTip = CalculateIntersectionPoint(beakStart, new Point(beakTip.X - startThickness, beakTip.Y + startAngleThicknessOffset), beakEnd, new Point(beakTip.X + endAngleThicknessOffset, beakTip.Y - endThickness));
                     break;
                 case BeakDirection.BottomLeft:
-                    arrowStart.Offset(-startAngleThicknessOffset, -startThickness);
+                    beakStart.Offset(-startAngleThicknessOffset, -startThickness);
 
-                    arrowEnd.Offset(endThickness, endAngleThicknessOffset);
+                    beakEnd.Offset(endThickness, endAngleThicknessOffset);
 
-                    arrowTip = CalculateIntersectionPoint(arrowStart, new Point(arrowTip.X - startAngleThicknessOffset, arrowTip.Y - startThickness), arrowEnd, new Point(arrowTip.X + endThickness, arrowTip.Y + endAngleThicknessOffset));
+                    beakTip = CalculateIntersectionPoint(beakStart, new Point(beakTip.X - startAngleThicknessOffset, beakTip.Y - startThickness), beakEnd, new Point(beakTip.X + endThickness, beakTip.Y + endAngleThicknessOffset));
                     break;
             }
         }
