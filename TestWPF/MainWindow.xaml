@@ -82,7 +82,7 @@
             </local:FlexCustomItemsControl>-->
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="100" Width="150" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100"/>
+            <Thumb x:Name="TestThumb" Height="100" Width="150" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:PopTipService.PopTip="Test" local:PopTipService.Trigger="MouseOver"/>
         </Canvas>
     </Grid>
 </Window>
