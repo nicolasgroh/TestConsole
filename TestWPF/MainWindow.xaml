@@ -41,7 +41,7 @@
             <Button Content="Test5"/>
             <Button Content="Test6"/>
             <Button Content="Test7"/>
-            <local:BeakedBorder Background="Green" CornerRadius="4" BeakDirection="BottomRight" Height="40" BorderThickness="2" BorderBrush="Gray">
+            <local:BeakedBorder Background="Gray" CornerRadius="4" BeakDirection="BottomRight" Height="40" BorderThickness="2" BorderBrush="Purple">
                 <TextBlock Text="Hello" Margin="3 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </local:BeakedBorder>
         </local:TablePanel>

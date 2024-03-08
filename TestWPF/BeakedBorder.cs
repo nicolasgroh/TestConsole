@@ -54,9 +54,9 @@ namespace TestWPF
         {
             private GeometryPoint(Point coordinates, LineType lineType, Size arcSize = default)
             {
-                Coordinates = coordinates;
-                LineType = lineType;
-                ArcSize = arcSize;
+                _coordinates = coordinates;
+                _lineType = lineType;
+                _arcSize = arcSize;
             }
 
             public static GeometryPoint Line(Point coordinates)
@@ -69,9 +69,13 @@ namespace TestWPF
                 return new GeometryPoint(coordinates, LineType.Arc, arcSize);
             }
 
-            public Point Coordinates;
-            public LineType LineType;
-            public Size ArcSize;
+            private Point _coordinates;
+            private LineType _lineType;
+            private Size _arcSize;
+
+            public Point Coordinates { get { return _coordinates; } }
+            public LineType LineType { get { return _lineType; } }
+            public Size ArcSize { get { return _arcSize; } }
         }
 
         private const int MAXIMUM_POINTS_COUNT = 11;
