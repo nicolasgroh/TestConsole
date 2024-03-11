@@ -44,6 +44,7 @@
             <local:BeakedBorder Background="Gray" CornerRadius="4" BeakDirection="BottomRight" Height="40" BorderThickness="2" BorderBrush="Purple">
                 <TextBlock Text="Hello" Margin="3 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </local:BeakedBorder>
+            <TextBox local:PopTipService.PopTip="Test" local:PopTipService.Trigger="Focus"/>
         </local:TablePanel>
 
         <!--<local:FlexCustomItemsControl x:Name="TestItemsControl" Grid.Row="1" ItemsSource="{Binding TestCollection}" MinItemWidth="100">

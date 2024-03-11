@@ -122,7 +122,7 @@ namespace TestWPF
 
             if (style != null) balloonTip.Style = style;
             else if (placementTargetBalloonTipStyle != DependencyProperty.UnsetValue) balloonTip.Style = (Style)placementTargetBalloonTipStyle;
-
+            
             ApplyPlacementTargetValues(placementTarget, balloonTip);
 
             applyValues?.Invoke(balloonTip);

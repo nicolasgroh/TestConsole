@@ -21,6 +21,7 @@ namespace TestWPF
 
     public static class PopTipService
     {
+        #region DependancyProperties
         public static readonly DependencyProperty PopTipProperty = DependencyProperty.RegisterAttached("PopTip", typeof(object), typeof(PopTipService), new FrameworkPropertyMetadata(null, PopTipPropertyChanged));
 
         private static void PopTipPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -90,6 +91,79 @@ namespace TestWPF
             obj.SetValue(TriggerProperty, value);
         }
 
+        public static readonly DependencyProperty PlacementModeProperty = DependencyProperty.RegisterAttached("PlacementMode", typeof(PopupAdornerPlacementMode), typeof(PopTipService), new FrameworkPropertyMetadata(PopupAdornerPlacementMode.Top));
+
+        public static PopupAdornerPlacementMode GetPlacementMode(DependencyObject obj)
+        {
+            return (PopupAdornerPlacementMode)obj.GetValue(PlacementModeProperty);
+        }
+
+        public static void SetPlacementMode(DependencyObject obj, PopupAdornerPlacementMode value)
+        {
+            obj.SetValue(PlacementModeProperty, value);
+        }
+
+        public static readonly DependencyProperty HorizontalOffsetProperty = DependencyProperty.RegisterAttached("HorizontalOffset", typeof(double), typeof(PopTipService), new FrameworkPropertyMetadata(0d));
+
+        public static double GetHorizontalOffset(DependencyObject obj)
+        {
+            return (double)obj.GetValue(HorizontalOffsetProperty);
+        }
+
+        public static void SetHorizontalOffset(DependencyObject obj, double value)
+        {
+            obj.SetValue(HorizontalOffsetProperty, value);
+        }
+
+        public static readonly DependencyProperty VerticalOffsetProperty = DependencyProperty.RegisterAttached("VerticalOffset", typeof(double), typeof(PopTipService), new FrameworkPropertyMetadata(0d));
+
+        public static double GetVerticalOffset(DependencyObject obj)
+        {
+            return (double)obj.GetValue(VerticalOffsetProperty);
+        }
+
+        public static void SetVerticalOffset(DependencyObject obj, double value)
+        {
+            obj.SetValue(VerticalOffsetProperty, value);
+        }
+
+        public static readonly DependencyProperty UseDynamicPlacementProperty = DependencyProperty.RegisterAttached("UseDynamicPlacement", typeof(bool), typeof(PopTipService), new FrameworkPropertyMetadata(true));
+
+        public static bool GetUseDynamicPlacement(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(UseDynamicPlacementProperty);
+        }
+
+        public static void SetUseDynamicPlacement(DependencyObject obj, bool value)
+        {
+            obj.SetValue(UseDynamicPlacementProperty, value);
+        }
+
+        public static readonly DependencyProperty KeepWithinViewProperty = DependencyProperty.RegisterAttached("KeepWithinView", typeof(bool), typeof(PopTipService), new FrameworkPropertyMetadata(true));
+
+        public static bool GetKeepWithinView(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(KeepWithinViewProperty);
+        }
+
+        public static void SetKeepWithinView(DependencyObject obj, bool value)
+        {
+            obj.SetValue(KeepWithinViewProperty, value);
+        }
+
+        public static readonly DependencyProperty StyleProperty = DependencyProperty.RegisterAttached("Style", typeof(Style), typeof(PopTipService));
+
+        public static Style GetStyle(DependencyObject obj)
+        {
+            return (Style)obj.GetValue(StyleProperty);
+        }
+
+        public static void SetStyle(DependencyObject obj, Style value)
+        {
+            obj.SetValue(StyleProperty, value);
+        }
+        #endregion
+
         private static bool HasPopTip(UIElement placementTarget)
         {
             return GetPopTip(placementTarget) != null;
@@ -158,10 +232,49 @@ namespace TestWPF
                             Source = placementTarget
                         });
 
+                        popTip.SetBinding(FrameworkElement.StyleProperty, new Binding()
+                        {
+                            Path = new PropertyPath(StyleProperty),
+                            Source = placementTarget
+                        });
+
                         var popTipAdorner = new PopupAdorner(placementTarget)
                         {
-                            Child = popTip
+                            Child = popTip,
+                            PlacementMode = PopupAdornerPlacementMode.Top
                         };
+
+                        popTipAdorner.SetBinding(PopupAdorner.PlacementModeProperty, new Binding()
+                        {
+                            Path = new PropertyPath(PlacementModeProperty),
+                            Source = placementTarget
+                        });
+
+                        popTipAdorner.SetBinding(PopupAdorner.HorizontalOffsetProperty, new Binding()
+                        {
+                            Path = new PropertyPath(HorizontalOffsetProperty),
+                            Source = placementTarget
+                        });
+
+                        popTipAdorner.SetBinding(PopupAdorner.VerticalOffsetProperty, new Binding()
+                        {
+                            Path = new PropertyPath(VerticalOffsetProperty),
+                            Source = placementTarget
+                        });
+
+                        popTipAdorner.SetBinding(PopupAdorner.UseDynamicPlacementProperty, new Binding()
+                        {
+                            Path = new PropertyPath(UseDynamicPlacementProperty),
+                            Source = placementTarget
+                        });
+
+                        popTipAdorner.SetBinding(PopupAdorner.KeepWithinViewProperty, new Binding()
+                        {
+                            Path = new PropertyPath(KeepWithinViewProperty),
+                            Source = placementTarget
+                        });
+
+                        popTipAdorner.ComputedPlacementModeChanged += PopTipAdorner_ComputedPlacementModeChanged;
 
                         adornerLayer.Add(popTipAdorner);
                     }
@@ -169,11 +282,22 @@ namespace TestWPF
             }
             else
             {
-                if (!TryFindPopTipAdorner(placementTarget, out var adornerLayer, out var popTipAdorner))
+                if (TryFindPopTipAdorner(placementTarget, out var adornerLayer, out var popTipAdorner))
                 {
-                    if (popTipAdorner != null) adornerLayer.Remove(popTipAdorner);
+                    if (popTipAdorner != null)
+                    {
+                        popTipAdorner.ComputedPlacementModeChanged -= PopTipAdorner_ComputedPlacementModeChanged;
+                        adornerLayer.Remove(popTipAdorner);
+                    }
                 }
             }
+        }
+
+        private static void PopTipAdorner_ComputedPlacementModeChanged(PopupAdorner sender, GenericPropertyChangedEventArgs<PopupAdornerPlacementMode> eventArgs)
+        {
+            var popTip = (PopTip)sender.Child;
+
+            popTip.SetComputedPlacementMode(sender.ComputedPlacementMode);
         }
 
         private static bool TryFindPopTipAdorner(UIElement placementTarget, out AdornerLayer adornerLayer, out PopupAdorner popTipAdorner)
