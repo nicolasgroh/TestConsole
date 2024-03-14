@@ -220,7 +220,7 @@ namespace TestWPF
         {
             if (GetIsOpen(placementTarget) && HasPopTip(placementTarget))
             {
-                if (!TryFindPopTipAdorner(placementTarget, out var adornerLayer, out _))
+                if (!TryFindPopTipPopupAdorner(placementTarget, out var adornerLayer, out _))
                 {
                     if (adornerLayer != null)
                     {
@@ -238,85 +238,85 @@ namespace TestWPF
                             Source = placementTarget
                         });
 
-                        var popTipAdorner = new PopupAdorner(placementTarget)
+                        var popTipPopupAdorner = new PopupAdorner(placementTarget)
                         {
                             Child = popTip,
                             PlacementMode = PopupAdornerPlacementMode.Top
                         };
 
-                        popTipAdorner.SetBinding(PopupAdorner.PlacementModeProperty, new Binding()
+                        popTipPopupAdorner.SetBinding(PopupAdorner.PlacementModeProperty, new Binding()
                         {
                             Path = new PropertyPath(PlacementModeProperty),
                             Source = placementTarget
                         });
 
-                        popTipAdorner.SetBinding(PopupAdorner.HorizontalOffsetProperty, new Binding()
+                        popTipPopupAdorner.SetBinding(PopupAdorner.HorizontalOffsetProperty, new Binding()
                         {
                             Path = new PropertyPath(HorizontalOffsetProperty),
                             Source = placementTarget
                         });
 
-                        popTipAdorner.SetBinding(PopupAdorner.VerticalOffsetProperty, new Binding()
+                        popTipPopupAdorner.SetBinding(PopupAdorner.VerticalOffsetProperty, new Binding()
                         {
                             Path = new PropertyPath(VerticalOffsetProperty),
                             Source = placementTarget
                         });
 
-                        popTipAdorner.SetBinding(PopupAdorner.UseDynamicPlacementProperty, new Binding()
+                        popTipPopupAdorner.SetBinding(PopupAdorner.UseDynamicPlacementProperty, new Binding()
                         {
                             Path = new PropertyPath(UseDynamicPlacementProperty),
                             Source = placementTarget
                         });
 
-                        popTipAdorner.SetBinding(PopupAdorner.KeepWithinViewProperty, new Binding()
+                        popTipPopupAdorner.SetBinding(PopupAdorner.KeepWithinViewProperty, new Binding()
                         {
                             Path = new PropertyPath(KeepWithinViewProperty),
                             Source = placementTarget
                         });
 
-                        popTipAdorner.ComputedPlacementModeChanged += PopTipAdorner_ComputedPlacementModeChanged;
+                        popTipPopupAdorner.ComputedPlacementModeChanged += PopTipPopupAdorner_ComputedPlacementModeChanged;
 
-                        adornerLayer.Add(popTipAdorner);
+                        adornerLayer.Add(popTipPopupAdorner);
                     }
                 }
             }
             else
             {
-                if (TryFindPopTipAdorner(placementTarget, out var adornerLayer, out var popTipAdorner))
+                if (TryFindPopTipPopupAdorner(placementTarget, out var adornerLayer, out var popTipPopupAdorner))
                 {
-                    if (popTipAdorner != null)
+                    if (popTipPopupAdorner != null)
                     {
-                        popTipAdorner.ComputedPlacementModeChanged -= PopTipAdorner_ComputedPlacementModeChanged;
-                        adornerLayer.Remove(popTipAdorner);
+                        popTipPopupAdorner.ComputedPlacementModeChanged -= PopTipPopupAdorner_ComputedPlacementModeChanged;
+                        adornerLayer.Remove(popTipPopupAdorner);
                     }
                 }
             }
         }
 
-        private static void PopTipAdorner_ComputedPlacementModeChanged(PopupAdorner sender, GenericPropertyChangedEventArgs<PopupAdornerPlacementMode> eventArgs)
+        private static void PopTipPopupAdorner_ComputedPlacementModeChanged(PopupAdorner sender, GenericPropertyChangedEventArgs<PopupAdornerPlacementMode> eventArgs)
         {
             var popTip = (PopTip)sender.Child;
 
             popTip.SetComputedPlacementMode(sender.ComputedPlacementMode);
         }
 
-        private static bool TryFindPopTipAdorner(UIElement placementTarget, out AdornerLayer adornerLayer, out PopupAdorner popTipAdorner)
+        private static bool TryFindPopTipPopupAdorner(UIElement placementTarget, out AdornerLayer adornerLayer, out PopupAdorner popTipPopupAdorner)
         {
             adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
 
             if (adornerLayer == null)
             {
-                popTipAdorner = null;
+                popTipPopupAdorner = null;
                 return false;
             }
 
             var adorners = adornerLayer.GetAdorners(placementTarget);
 
-            popTipAdorner = null;
+            popTipPopupAdorner = null;
 
-            if (adorners != null && adorners.Length > 0) popTipAdorner = adorners.OfType<PopupAdorner>().FirstOrDefault(x => x.Child is PopTip);
+            if (adorners != null && adorners.Length > 0) popTipPopupAdorner = adorners.OfType<PopupAdorner>().FirstOrDefault(x => x.Child is PopTip);
 
-            return popTipAdorner != null;
+            return popTipPopupAdorner != null;
         }
     }
 }

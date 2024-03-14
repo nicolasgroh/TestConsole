@@ -497,16 +497,20 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:PopTip}">
                     <Grid>
-                        <local:BeakedBorder x:Name="DropShadowBorder" Background="#CCCCCC" BorderBrush="#CCCCCC" BorderThickness="{TemplateBinding BorderThickness}" BeakWidth="15" BeakLenght="10" CornerRadius="2">
+                        <local:BeakedBorder x:Name="DropShadowBorder" BeakDirection="None" Background="#CCCCCC" BorderBrush="#CCCCCC" BorderThickness="{TemplateBinding BorderThickness}" BeakWidth="15" BeakLenght="10" CornerRadius="2">
                             <local:BeakedBorder.Effect>
                                 <DropShadowEffect BlurRadius="2" ShadowDepth="0" Direction="270" RenderingBias="Performance" Color="#CCCCCC"/>
                             </local:BeakedBorder.Effect>
                         </local:BeakedBorder>
-                        <local:BeakedBorder x:Name="DisplayBeakedBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" BeakWidth="15" BeakLenght="10">
+                        <local:BeakedBorder x:Name="DisplayBeakedBorder" BeakDirection="None" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" BeakWidth="15" BeakLenght="10">
                             <ContentPresenter Margin="{TemplateBinding Padding}"/>
                         </local:BeakedBorder>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="ComputedPlacementMode" Value="Relative">
+                            <Setter TargetName="DropShadowBorder" Property="Opacity" Value="0.2"/>
+                            <Setter TargetName="DisplayBeakedBorder" Property="Opacity" Value="0.2"/>
+                        </Trigger>
                         <Trigger Property="ComputedPlacementMode" Value="Left">
                             <Setter TargetName="DropShadowBorder" Property="BeakDirection" Value="Right"/>
                             <Setter TargetName="DisplayBeakedBorder" Property="BeakDirection" Value="Right"/>
@@ -567,5 +571,33 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}">
+        <Setter Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <DockPanel>
+                        <Border DockPanel.Dock="Bottom" Background="White" BorderBrush="Gray" BorderThickness="1 0 1 1">
+                            <ItemsControl ItemsSource="{Binding }">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type ValidationError}">
+                                        <ContentPresenter Content="{Binding ErrorContent}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                        <AdornedElementPlaceholder>
+                            <Border Background="Red" Opacity="0.2" IsHitTestVisible="False"/>
+                        </AdornedElementPlaceholder>
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

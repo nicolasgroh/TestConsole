@@ -15,10 +15,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Net;
+using System.ComponentModel;
 
 namespace TestWPF
 {
-    public partial class MainWindow : Window, System.ComponentModel.INotifyPropertyChanged
+    public partial class MainWindow : Window, System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo
     {
         public MainWindow()
         {
@@ -52,6 +53,21 @@ namespace TestWPF
                 _testCollection ??= new ObservableCollection<string>();
 
                 return _testCollection;
+            }
+        }
+
+        public string Error => null;
+
+        public string this[string propertyName]
+        {
+            get
+            {
+                if (propertyName == nameof(TestProperty))
+                {
+                    return "Immer falsch";
+                }
+
+                return null;
             }
         }
 

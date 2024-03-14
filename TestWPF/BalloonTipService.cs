@@ -1,16 +1,90 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace TestWPF
 {
     public static class BalloonTipService
     {
+        private class AdornerLayerAdornersIterator : IEnumerable<Adorner>
+        {
+            private struct AdornersEnumerator : IEnumerator<Adorner>
+            {
+                public AdornersEnumerator(AdornerLayer adornerLayer)
+                {
+                    _adornerLayer = adornerLayer;
+                    _index = 1;
+                    _current = null;
+                }
+
+                private AdornerLayer _adornerLayer;
+                private int _index;
+                private Adorner _current;
+
+                public Adorner Current { get { return _current; } }
+
+                object IEnumerator.Current { get { return _current; } }
+
+                public bool MoveNext()
+                {
+                    var count = VisualTreeHelper.GetChildrenCount(_adornerLayer);
+
+                    if (_index < count - 1)
+                    {
+                        var child = VisualTreeHelper.GetChild(_adornerLayer, _index);
+
+                        if (child is Adorner adorner)
+                        {
+                            _current = adorner;
+                            _index++;
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    Reset();
+                    return false;
+                }
+
+                public void Reset()
+                {
+                    _index = 1;
+                    _current = null;
+                }
+
+                public void Dispose()
+                {
+                    _adornerLayer = null;
+                    _current = null;
+                }
+            }
+
+            public AdornerLayerAdornersIterator(AdornerLayer adornerLayer)
+            {
+                _adornerLayer = adornerLayer;
+            }
+
+            private AdornerLayer _adornerLayer;
+
+            public IEnumerator<Adorner> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         #region AttachedProperties
         public static readonly DependencyProperty ShowDurationProperty = DependencyProperty.RegisterAttached("ShowDuration", typeof(int), typeof(BalloonTipService));
 
@@ -97,6 +171,33 @@ namespace TestWPF
         }
         #endregion
 
+        public static List<BalloonTip> GetBalloonTips(UIElement placementTarget)
+        {
+            if (placementTarget == null) throw new ArgumentNullException(nameof(placementTarget));
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
+
+            if (adornerLayer == null) return new List<BalloonTip>();
+
+            var adorners = adornerLayer.GetAdorners(placementTarget);
+
+            if (adorners == null || adorners.Length == 0) return new List<BalloonTip>();
+
+            return GetBalloonTipsFromAdorners(adorners).ToList();
+        }
+
+        public static List<BalloonTip> GetAllBalloonTips(AdornerLayer adornerLayer)
+        {
+            if (adornerLayer == null) throw new ArgumentNullException(nameof(adornerLayer));
+
+            var childrenCount = VisualTreeHelper.GetChildrenCount(adornerLayer);
+
+            // Wenn wir nicht mehr als einen Child haben, gibt es auch keine Adorner
+            if (childrenCount < 2) return new List<BalloonTip>();
+
+            return GetBalloonTipsFromAdorners(new AdornerLayerAdornersIterator(adornerLayer)).ToList();
+        }
+
         public static void ShowBalloonTip(this UIElement placementTarget, object content, object header = null, int? showDuration = null, PopupAdornerPlacementMode? placementMode = null, double? horizontalOffset = null, double? verticalOffset = null, bool? useDynamicPlacement = null, bool? keepWithinView = null, Style style = null)
         {
             var apllyValues = new Action<BalloonTip>((balloonTip) =>
@@ -114,6 +215,30 @@ namespace TestWPF
             ShowBalloonTip(placementTarget, apllyValues, style);
         }
 
+        public static void CloseBalloonTip(BalloonTip balloonTip)
+        {
+            var popupAdorner = balloonTip.Parent as PopupAdorner;
+
+            if (popupAdorner == null) return;
+
+            var placementTarget = popupAdorner.AdornedElement;
+
+            if (placementTarget == null) return;
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
+
+            if (adornerLayer == null) return;
+
+            var adorners = adornerLayer.GetAdorners(placementTarget);
+
+            if (adorners != null && adorners.Length > 0 && adorners.Contains(popupAdorner)) adornerLayer.Remove(popupAdorner);
+        }
+
+        private static IEnumerable<BalloonTip> GetBalloonTipsFromAdorners(IEnumerable<Adorner> adorners)
+        {
+            return adorners.OfType<PopupAdorner>().Where(x => x.Child is BalloonTip).Select(x => x.Child as BalloonTip);
+        }
+
         private static void ShowBalloonTip(UIElement placementTarget, Action<BalloonTip> applyValues, Style style = null)
         {
             var balloonTip = new BalloonTip();
@@ -122,7 +247,7 @@ namespace TestWPF
 
             if (style != null) balloonTip.Style = style;
             else if (placementTargetBalloonTipStyle != DependencyProperty.UnsetValue) balloonTip.Style = (Style)placementTargetBalloonTipStyle;
-            
+
             ApplyPlacementTargetValues(placementTarget, balloonTip);
 
             applyValues?.Invoke(balloonTip);
