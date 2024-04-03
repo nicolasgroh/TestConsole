@@ -18,10 +18,10 @@ namespace TestWPF
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BalloonTip), new FrameworkPropertyMetadata(typeof(BalloonTip)));
         }
 
-        public static readonly DependencyProperty ShowDurationProperty = BalloonTipService.ShowDurationProperty.AddOwner(typeof(BalloonTip), new FrameworkPropertyMetadata(3000));
-        public int ShowDuration
+        public static readonly DependencyProperty ShowDurationProperty = BalloonTipService.ShowDurationProperty.AddOwner(typeof(BalloonTip), new FrameworkPropertyMetadata(new Duration(TimeSpan.FromSeconds(3))));
+        public Duration ShowDuration
         {
-            get { return (int)GetValue(ShowDurationProperty); }
+            get { return (Duration)GetValue(ShowDurationProperty); }
             set { SetValue(ShowDurationProperty, value); }
         }
 

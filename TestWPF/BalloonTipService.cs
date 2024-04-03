@@ -85,15 +85,120 @@ namespace TestWPF
             }
         }
 
-        #region AttachedProperties
-        public static readonly DependencyProperty ShowDurationProperty = DependencyProperty.RegisterAttached("ShowDuration", typeof(int), typeof(BalloonTipService));
-
-        public static int GetShowDuration(DependencyObject obj)
+        public interface IBalloonTipConfiguration
         {
-            return (int)obj.GetValue(ShowDurationProperty);
+            public object Content { get; }
+
+            public object Header { get; }
+
+            public Duration? ShowDuration { get; }
+
+            public PopupAdornerPlacementMode? PlacementMode { get; }
+
+            public double? HorizontalOffset { get; }
+
+            public double? VerticalOffset { get; }
+
+            public bool? UseDynamicPlacement { get; }
+
+            public bool? KeepWithinView { get; }
+
+            public Style Style { get; }
         }
 
-        public static void SetShowDuration(DependencyObject obj, int value)
+        public class BalloonTipConfiguration
+        {
+            private object _content;
+            public object Content => _content;
+
+            private object _header;
+            public object Header => _header;
+
+            private Duration? _showDuration;
+            public Duration? ShowDuration => _showDuration;
+
+            private PopupAdornerPlacementMode? _placementMode;
+            public PopupAdornerPlacementMode? PlacementMode => _placementMode;
+
+            private double? _horizontalOffset;
+            public double? HorizontalOffset => _horizontalOffset;
+
+            private double? _verticalOffset;
+            public double? VerticalOffset => _verticalOffset;
+
+            private bool? _useDynamicPlacement;
+            public bool? UseDynamicPlacement => _useDynamicPlacement;
+
+            private bool? _keepWithinView;
+            public bool? KeepWithinView => _keepWithinView;
+
+            private Style _Style;
+            public Style Style => _Style;
+
+            public BalloonTipConfiguration SetContent(object content)
+            {
+                _content = content;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetHeader(object header)
+            {
+                _header = header;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetShowDuration(Duration showDuration)
+            {
+                _showDuration = showDuration;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetPlacementMode(PopupAdornerPlacementMode placementMode)
+            {
+                _placementMode = placementMode;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetHorizontalOffset(double horizontalOffset)
+            {
+                _horizontalOffset = horizontalOffset;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetVerticalOffset(double verticalOffset)
+            {
+                _verticalOffset = verticalOffset;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetUseDynamicPlacement(bool useDynamicPlacement)
+            {
+                _useDynamicPlacement = useDynamicPlacement;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetKeepWithinView(bool keepWithinView)
+            {
+                _keepWithinView = keepWithinView;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetStyle(Style style)
+            {
+                _Style = style;
+                return this;
+            }
+        }
+
+        #region AttachedProperties
+        public static readonly DependencyProperty ShowDurationProperty = DependencyProperty.RegisterAttached("ShowDuration", typeof(Duration), typeof(BalloonTipService));
+
+        public static Duration GetShowDuration(DependencyObject obj)
+        {
+            return (Duration)obj.GetValue(ShowDurationProperty);
+        }
+
+        public static void SetShowDuration(DependencyObject obj, Duration value)
         {
             obj.SetValue(ShowDurationProperty, value);
         }
@@ -198,21 +303,43 @@ namespace TestWPF
             return GetBalloonTipsFromAdorners(new AdornerLayerAdornersIterator(adornerLayer)).ToList();
         }
 
-        public static void ShowBalloonTip(this UIElement placementTarget, object content, object header = null, int? showDuration = null, PopupAdornerPlacementMode? placementMode = null, double? horizontalOffset = null, double? verticalOffset = null, bool? useDynamicPlacement = null, bool? keepWithinView = null, Style style = null)
+        public static BalloonTipConfiguration ConfigureBalloonTip()
+        {
+            return new BalloonTipConfiguration();
+        }
+
+        public static void ShowBalloonTip(this UIElement placementTarget, BalloonTipConfiguration configuration)
         {
             var apllyValues = new Action<BalloonTip>((balloonTip) =>
             {
-                balloonTip.Content = content;
-                balloonTip.Header = header;
-                if (showDuration != null) balloonTip.ShowDuration = showDuration.Value;
-                if (placementMode != null) balloonTip.PlacementMode = placementMode.Value;
-                if (horizontalOffset != null) balloonTip.HorizontalOffset = horizontalOffset.Value;
-                if (verticalOffset != null) balloonTip.VerticalOffset = verticalOffset.Value;
-                if (useDynamicPlacement != null) balloonTip.UseDynamicPlacement = useDynamicPlacement.Value;
-                if (keepWithinView != null) balloonTip.KeepWithinView = keepWithinView.Value;
+                balloonTip.Content = configuration.Content;
+                balloonTip.Header = configuration.Header;
+                if (configuration.ShowDuration != null) balloonTip.ShowDuration = configuration.ShowDuration.Value;
+                if (configuration.PlacementMode != null) balloonTip.PlacementMode = configuration.PlacementMode.Value;
+                if (configuration.HorizontalOffset != null) balloonTip.HorizontalOffset = configuration.HorizontalOffset.Value;
+                if (configuration.VerticalOffset != null) balloonTip.VerticalOffset = configuration.VerticalOffset.Value;
+                if (configuration.UseDynamicPlacement != null) balloonTip.UseDynamicPlacement = configuration.UseDynamicPlacement.Value;
+                if (configuration.KeepWithinView != null) balloonTip.KeepWithinView = configuration.KeepWithinView.Value;
             });
 
-            ShowBalloonTip(placementTarget, apllyValues, style);
+            ShowBalloonTip(placementTarget, apllyValues, configuration.Style);
+        }
+
+        public static void ShowBalloonTip(this UIElement placementTarget, object content, object header = null, Duration? showDuration = null, PopupAdornerPlacementMode? placementMode = null, double? horizontalOffset = null, double? verticalOffset = null, bool? useDynamicPlacement = null, bool? keepWithinView = null, Style style = null)
+        {
+            var config = ConfigureBalloonTip()
+                .SetContent(content)
+                .SetHeader(header);
+
+            if (showDuration != null) config.SetShowDuration(showDuration.Value);
+            if (placementMode != null) config.SetPlacementMode(placementMode.Value);
+            if (horizontalOffset != null) config.SetHorizontalOffset(horizontalOffset.Value);
+            if (verticalOffset != null) config.SetVerticalOffset(verticalOffset.Value);
+            if (useDynamicPlacement != null) config.SetUseDynamicPlacement(useDynamicPlacement.Value);
+            if (keepWithinView != null) config.SetKeepWithinView(keepWithinView.Value);
+            if (style != null) config.SetStyle(style);
+
+            ShowBalloonTip(placementTarget, config);
         }
 
         public static void CloseBalloonTip(BalloonTip balloonTip)
@@ -281,7 +408,7 @@ namespace TestWPF
         {
             var showDuration = placementTarget.ReadLocalValue(ShowDurationProperty);
 
-            if (showDuration != DependencyProperty.UnsetValue) balloonTip.ShowDuration = (int)showDuration;
+            if (showDuration != DependencyProperty.UnsetValue) balloonTip.ShowDuration = (Duration)showDuration;
 
             var placementMode = placementTarget.ReadLocalValue(PlacementModeProperty);
 
@@ -304,7 +431,7 @@ namespace TestWPF
             if (keepWithinViewProperty != DependencyProperty.UnsetValue) balloonTip.KeepWithinView = (bool)keepWithinViewProperty;
         }
 
-        private static bool TryShowBalloonTipPopupAdorner(PopupAdorner popupAdorner, UIElement placementTarget, int showDuration)
+        private static bool TryShowBalloonTipPopupAdorner(PopupAdorner popupAdorner, UIElement placementTarget, Duration showDuration)
         {
             var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
 
@@ -312,15 +439,18 @@ namespace TestWPF
 
             adornerLayer.Add(popupAdorner);
 
-            var timer = new DispatcherTimer()
+            if (showDuration.HasTimeSpan)
             {
-                Interval = TimeSpan.FromMilliseconds(showDuration),
-                Tag = popupAdorner
-            };
+                var timer = new DispatcherTimer()
+                {
+                    Interval = showDuration.TimeSpan,
+                    Tag = popupAdorner
+                };
 
-            timer.Tick += BalloonTipTimer_Tick;
+                timer.Tick += BalloonTipTimer_Tick;
 
-            timer.Start();
+                timer.Start();
+            }
 
             return true;
         }

@@ -143,7 +143,12 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            TestThumb.ShowBalloonTip("Hallooooo!", "Header");
+            var config = BalloonTipService.ConfigureBalloonTip()
+                .SetContent("Hallooooo!")
+                .SetHeader("Header")
+                .SetShowDuration(Duration.Forever);
+
+            TestThumb.ShowBalloonTip(config);
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
