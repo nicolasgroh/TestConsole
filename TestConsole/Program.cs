@@ -9,6 +9,7 @@ using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using CsvHelper.Configuration;
 using System.Windows;
+using System.Net.Http;
 
 namespace TestConsole
 {
@@ -16,7 +17,7 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            CSVPrettifier();
+            GetNancyUriViaHttpClient();
         }
 
         #region Gimeg SalesOrder Parsen
@@ -658,6 +659,34 @@ namespace TestConsole
             Console.WriteLine(publicKey);
 
             Console.ReadLine();
+        }
+        #endregion
+
+        #region NancyUri über HttpClient
+        private static void GetNancyUriViaHttpClient(string registryUri, string version)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var response = httpClient.GetAsync(registryUri.TrimEnd('/') + $"/Nancy/{version}");
+
+                response.Wait();
+
+                var result = response.Result;
+
+                var resultContent = result.Content.ReadAsStringAsync();
+
+                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    throw new Exception("Fehler beim Synchronisieren des anderen Mandanten:\nDas abrufen der Serveradresse ist fehlgeschlage:\n\n" + resultContent);
+                }
+
+                resultContent.Wait();
+
+                var nancyUri = resultContent.Result;
+
+                Console.WriteLine(nancyUri);
+                Console.ReadLine();
+            }
         }
         #endregion
     }

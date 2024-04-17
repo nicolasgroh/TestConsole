@@ -42,11 +42,6 @@ namespace TestWPF
         #endregion
 
         #region Constructors
-        static PopupAdorner()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupAdorner), new FrameworkPropertyMetadata(typeof(PopupAdorner)));
-        }
-
         public PopupAdorner(UIElement adornedElement) : base(adornedElement)
         {
 

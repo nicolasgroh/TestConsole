@@ -7,12 +7,35 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace TestWPF
 {
     public class BalloonTip : HeaderedContentControl
     {
+        private class CloseBalloonTipCommand : ICommand
+        {
+            public CloseBalloonTipCommand(BalloonTip balloonTip)
+            {
+                _balloonTip = balloonTip;
+            }
+
+            private readonly BalloonTip _balloonTip;
+
+            public event EventHandler CanExecuteChanged;
+
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
+
+            public void Execute(object parameter)
+            {
+                BalloonTipService.CloseBalloonTip(_balloonTip);
+            }
+        }
+
         static BalloonTip()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BalloonTip), new FrameworkPropertyMetadata(typeof(BalloonTip)));
@@ -68,6 +91,22 @@ namespace TestWPF
         {
             get { return (bool)GetValue(KeepWithinViewProperty); }
             set { SetValue(KeepWithinViewProperty, value); }
+        }
+
+        private ICommand _closeCommmand;
+        public ICommand CloseCommand
+        {
+            get
+            {
+                _closeCommmand ??= new CloseBalloonTipCommand(this);
+
+                return _closeCommmand;
+            }
+        }
+
+        public void Close()
+        {
+            BalloonTipService.CloseBalloonTip(this);
         }
 
         internal void SetComputedPlacementMode(PopupAdornerPlacementMode computedPlacementMode)

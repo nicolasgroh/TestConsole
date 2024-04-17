@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Net;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace TestWPF
 {
@@ -143,12 +144,17 @@ namespace TestWPF
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            var config = BalloonTipService.ConfigureBalloonTip()
-                .SetContent("Hallooooo!")
-                .SetHeader("Header")
-                .SetShowDuration(Duration.Forever);
+            var contentSpan = new Span();
+            contentSpan.Inlines.Add(new Run("Hallooooo!"));
+            contentSpan.Inlines.Add(new LineBreak());
+            contentSpan.Inlines.Add(new Hyperlink(new Run("Ich bin ein Hyperlink")));
 
-            TestThumb.ShowBalloonTip(config);
+            TestThumb.ShowBalloonTip(BalloonTipService.ConfigureBalloonTip()
+                .SetContent(contentSpan)
+                .SetHeader("Header")
+                .SetShowDuration(Duration.Forever)
+                .SetPlacementMode(PopupAdornerPlacementMode.BottomLeft)
+                .SetStyle((Style)TryFindResource("DismissableBalloonTipStyle")));
         }
 
         private void TestThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
@@ -168,6 +174,11 @@ namespace TestWPF
         private void RootBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var test = BalloonTipService.GetBalloonTips(TestThumb);
         }
     }
 }

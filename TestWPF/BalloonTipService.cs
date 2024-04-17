@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -36,7 +37,7 @@ namespace TestWPF
                 {
                     var count = VisualTreeHelper.GetChildrenCount(_adornerLayer);
 
-                    if (_index < count - 1)
+                    if (_index < count)
                     {
                         var child = VisualTreeHelper.GetChild(_adornerLayer, _index);
 
@@ -76,117 +77,129 @@ namespace TestWPF
 
             public IEnumerator<Adorner> GetEnumerator()
             {
-                throw new NotImplementedException();
+                return new AdornersEnumerator(_adornerLayer);
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                throw new NotImplementedException();
+                return GetEnumerator();
             }
         }
 
         public interface IBalloonTipConfiguration
         {
-            public object Content { get; }
-
-            public object Header { get; }
-
-            public Duration? ShowDuration { get; }
-
-            public PopupAdornerPlacementMode? PlacementMode { get; }
-
-            public double? HorizontalOffset { get; }
-
-            public double? VerticalOffset { get; }
-
-            public bool? UseDynamicPlacement { get; }
-
-            public bool? KeepWithinView { get; }
-
-            public Style Style { get; }
+            void ApplyConfiguration(BalloonTip balloonTip);
         }
 
-        public class BalloonTipConfiguration
+        public class BalloonTipConfiguration : IBalloonTipConfiguration
         {
-            private object _content;
-            public object Content => _content;
-
-            private object _header;
-            public object Header => _header;
-
-            private Duration? _showDuration;
-            public Duration? ShowDuration => _showDuration;
-
-            private PopupAdornerPlacementMode? _placementMode;
-            public PopupAdornerPlacementMode? PlacementMode => _placementMode;
-
-            private double? _horizontalOffset;
-            public double? HorizontalOffset => _horizontalOffset;
-
-            private double? _verticalOffset;
-            public double? VerticalOffset => _verticalOffset;
-
-            private bool? _useDynamicPlacement;
-            public bool? UseDynamicPlacement => _useDynamicPlacement;
-
-            private bool? _keepWithinView;
-            public bool? KeepWithinView => _keepWithinView;
-
-            private Style _Style;
-            public Style Style => _Style;
+            private Action<BalloonTip> _setContent;
+            private Action<BalloonTip> _setContentTemplate;
+            private Action<BalloonTip> _setContentTemplateSelector;
+            private Action<BalloonTip> _setHeader;
+            private Action<BalloonTip> _setHeaderTemplate;
+            private Action<BalloonTip> _setHeaderTemplateSelector;
+            private Action<BalloonTip> _setShowDuration;
+            private Action<BalloonTip> _setPlacementMode;
+            private Action<BalloonTip> _setHorizontalOffset;
+            private Action<BalloonTip> _setVerticalOffset;
+            private Action<BalloonTip> _setUseDynamicPlacement;
+            private Action<BalloonTip> _setKeepWithinView;
+            private Action<BalloonTip> _setStyle;
 
             public BalloonTipConfiguration SetContent(object content)
             {
-                _content = content;
+                _setContent = (balloonTip) => balloonTip.Content = content;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetContentTemplate(DataTemplate contentTemplate)
+            {
+                _setContentTemplate = (balloonTip) => balloonTip.ContentTemplate = contentTemplate;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetContentTemplateSelector(DataTemplateSelector contentTemplateSelector)
+            {
+                _setContentTemplateSelector = (balloonTip) => balloonTip.ContentTemplateSelector = contentTemplateSelector;
                 return this;
             }
 
             public BalloonTipConfiguration SetHeader(object header)
             {
-                _header = header;
+                _setHeader = (balloonTip) => balloonTip.Header = header;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetHeaderTemplate(DataTemplate headerTemplate)
+            {
+                _setHeaderTemplate = (balloonTip) => balloonTip.HeaderTemplate = headerTemplate;
+                return this;
+            }
+
+            public BalloonTipConfiguration SetHeaderTemplateSelector(DataTemplateSelector headerTemplateSelector)
+            {
+                _setHeaderTemplateSelector = (balloonTip) => balloonTip.HeaderTemplateSelector = headerTemplateSelector;
                 return this;
             }
 
             public BalloonTipConfiguration SetShowDuration(Duration showDuration)
             {
-                _showDuration = showDuration;
+                _setShowDuration = (balloonTip) => balloonTip.ShowDuration = showDuration;
                 return this;
             }
 
             public BalloonTipConfiguration SetPlacementMode(PopupAdornerPlacementMode placementMode)
             {
-                _placementMode = placementMode;
+                _setPlacementMode = (popupAdorner) => popupAdorner.PlacementMode = placementMode;
                 return this;
             }
 
             public BalloonTipConfiguration SetHorizontalOffset(double horizontalOffset)
             {
-                _horizontalOffset = horizontalOffset;
+                _setHorizontalOffset = (balloonTip) => balloonTip.HorizontalOffset = horizontalOffset;
                 return this;
             }
 
             public BalloonTipConfiguration SetVerticalOffset(double verticalOffset)
             {
-                _verticalOffset = verticalOffset;
+                _setVerticalOffset = (balloonTip) => balloonTip.VerticalOffset = verticalOffset;
                 return this;
             }
 
             public BalloonTipConfiguration SetUseDynamicPlacement(bool useDynamicPlacement)
             {
-                _useDynamicPlacement = useDynamicPlacement;
+                _setUseDynamicPlacement = (balloonTip) => balloonTip.UseDynamicPlacement = useDynamicPlacement;
                 return this;
             }
 
             public BalloonTipConfiguration SetKeepWithinView(bool keepWithinView)
             {
-                _keepWithinView = keepWithinView;
+                _setKeepWithinView = (balloonTip) => balloonTip.KeepWithinView = keepWithinView;
                 return this;
             }
 
             public BalloonTipConfiguration SetStyle(Style style)
             {
-                _Style = style;
+                _setStyle = (balloonTip) => balloonTip.Style = style;
                 return this;
+            }
+
+            public void ApplyConfiguration(BalloonTip balloonTip)
+            {
+                _setStyle?.Invoke(balloonTip);
+                _setContent?.Invoke(balloonTip);
+                _setContentTemplate?.Invoke(balloonTip);
+                _setContentTemplateSelector?.Invoke(balloonTip);
+                _setHeader?.Invoke(balloonTip);
+                _setHeaderTemplate?.Invoke(balloonTip);
+                _setHeaderTemplateSelector?.Invoke(balloonTip);
+                _setShowDuration?.Invoke(balloonTip);
+                _setPlacementMode?.Invoke(balloonTip);
+                _setHorizontalOffset?.Invoke(balloonTip);
+                _setVerticalOffset?.Invoke(balloonTip);
+                _setUseDynamicPlacement?.Invoke(balloonTip);
+                _setKeepWithinView?.Invoke(balloonTip);
             }
         }
 
@@ -310,36 +323,20 @@ namespace TestWPF
 
         public static void ShowBalloonTip(this UIElement placementTarget, BalloonTipConfiguration configuration)
         {
-            var apllyValues = new Action<BalloonTip>((balloonTip) =>
+            var balloonTip = new BalloonTip();
+
+            ApplyPlacementTargetValues(placementTarget, balloonTip);
+
+            configuration.ApplyConfiguration(balloonTip);
+
+            var popupAdorner = CreateBalloonTipPopupAdorner(balloonTip, placementTarget);
+
+            popupAdorner.ComputedPlacementModeChanged += PopupAdorner_ComputedPlacementModeChanged;
+
+            if (!TryShowBalloonTipPopupAdorner(popupAdorner, placementTarget, balloonTip.ShowDuration))
             {
-                balloonTip.Content = configuration.Content;
-                balloonTip.Header = configuration.Header;
-                if (configuration.ShowDuration != null) balloonTip.ShowDuration = configuration.ShowDuration.Value;
-                if (configuration.PlacementMode != null) balloonTip.PlacementMode = configuration.PlacementMode.Value;
-                if (configuration.HorizontalOffset != null) balloonTip.HorizontalOffset = configuration.HorizontalOffset.Value;
-                if (configuration.VerticalOffset != null) balloonTip.VerticalOffset = configuration.VerticalOffset.Value;
-                if (configuration.UseDynamicPlacement != null) balloonTip.UseDynamicPlacement = configuration.UseDynamicPlacement.Value;
-                if (configuration.KeepWithinView != null) balloonTip.KeepWithinView = configuration.KeepWithinView.Value;
-            });
-
-            ShowBalloonTip(placementTarget, apllyValues, configuration.Style);
-        }
-
-        public static void ShowBalloonTip(this UIElement placementTarget, object content, object header = null, Duration? showDuration = null, PopupAdornerPlacementMode? placementMode = null, double? horizontalOffset = null, double? verticalOffset = null, bool? useDynamicPlacement = null, bool? keepWithinView = null, Style style = null)
-        {
-            var config = ConfigureBalloonTip()
-                .SetContent(content)
-                .SetHeader(header);
-
-            if (showDuration != null) config.SetShowDuration(showDuration.Value);
-            if (placementMode != null) config.SetPlacementMode(placementMode.Value);
-            if (horizontalOffset != null) config.SetHorizontalOffset(horizontalOffset.Value);
-            if (verticalOffset != null) config.SetVerticalOffset(verticalOffset.Value);
-            if (useDynamicPlacement != null) config.SetUseDynamicPlacement(useDynamicPlacement.Value);
-            if (keepWithinView != null) config.SetKeepWithinView(keepWithinView.Value);
-            if (style != null) config.SetStyle(style);
-
-            ShowBalloonTip(placementTarget, config);
+                placementTarget.Dispatcher.BeginInvoke(new Action(() => TryShowBalloonTipPopupAdorner(popupAdorner, placementTarget, balloonTip.ShowDuration)));
+            }
         }
 
         public static void CloseBalloonTip(BalloonTip balloonTip)
@@ -366,35 +363,44 @@ namespace TestWPF
             return adorners.OfType<PopupAdorner>().Where(x => x.Child is BalloonTip).Select(x => x.Child as BalloonTip);
         }
 
-        private static void ShowBalloonTip(UIElement placementTarget, Action<BalloonTip> applyValues, Style style = null)
+        private static PopupAdorner CreateBalloonTipPopupAdorner(BalloonTip balloonTip, UIElement placementTarget)
         {
-            var balloonTip = new BalloonTip();
-
-            var placementTargetBalloonTipStyle = placementTarget.ReadLocalValue(StyleProperty);
-
-            if (style != null) balloonTip.Style = style;
-            else if (placementTargetBalloonTipStyle != DependencyProperty.UnsetValue) balloonTip.Style = (Style)placementTargetBalloonTipStyle;
-
-            ApplyPlacementTargetValues(placementTarget, balloonTip);
-
-            applyValues?.Invoke(balloonTip);
-
             var popupAdorner = new PopupAdorner(placementTarget)
             {
-                PlacementMode = balloonTip.PlacementMode,
-                HorizontalOffset = balloonTip.HorizontalOffset,
-                VerticalOffset = balloonTip.VerticalOffset,
-                UseDynamicPlacement = balloonTip.UseDynamicPlacement,
-                KeepWithinView = balloonTip.KeepWithinView,
                 Child = balloonTip
             };
 
-            popupAdorner.ComputedPlacementModeChanged += PopupAdorner_ComputedPlacementModeChanged;
-
-            if (!TryShowBalloonTipPopupAdorner(popupAdorner, placementTarget, balloonTip.ShowDuration))
+            popupAdorner.SetBinding(PopupAdorner.PlacementModeProperty, new System.Windows.Data.Binding
             {
-                placementTarget.Dispatcher.BeginInvoke(new Action(() => TryShowBalloonTipPopupAdorner(popupAdorner, placementTarget, balloonTip.ShowDuration)));
-            }
+                Path = new PropertyPath(BalloonTip.PlacementModeProperty),
+                Source = balloonTip
+            });
+
+            popupAdorner.SetBinding(PopupAdorner.HorizontalOffsetProperty, new System.Windows.Data.Binding
+            {
+                Path = new PropertyPath(BalloonTip.HorizontalOffsetProperty),
+                Source = balloonTip
+            });
+
+            popupAdorner.SetBinding(PopupAdorner.VerticalOffsetProperty, new System.Windows.Data.Binding
+            {
+                Path = new PropertyPath(BalloonTip.VerticalOffsetProperty),
+                Source = balloonTip
+            });
+
+            popupAdorner.SetBinding(PopupAdorner.UseDynamicPlacementProperty, new System.Windows.Data.Binding
+            {
+                Path = new PropertyPath(BalloonTip.UseDynamicPlacementProperty),
+                Source = balloonTip
+            });
+
+            popupAdorner.SetBinding(PopupAdorner.KeepWithinViewProperty, new System.Windows.Data.Binding
+            {
+                Path = new PropertyPath(BalloonTip.KeepWithinViewProperty),
+                Source = balloonTip
+            });
+
+            return popupAdorner;
         }
 
         private static void PopupAdorner_ComputedPlacementModeChanged(PopupAdorner sender, GenericPropertyChangedEventArgs<PopupAdornerPlacementMode> eventArgs)
@@ -406,6 +412,10 @@ namespace TestWPF
 
         private static void ApplyPlacementTargetValues(UIElement placementTarget, BalloonTip balloonTip)
         {
+            var placementTargetBalloonTipStyle = placementTarget.ReadLocalValue(StyleProperty);
+
+            if (placementTargetBalloonTipStyle != DependencyProperty.UnsetValue) balloonTip.Style = (Style)placementTargetBalloonTipStyle;
+
             var showDuration = placementTarget.ReadLocalValue(ShowDurationProperty);
 
             if (showDuration != DependencyProperty.UnsetValue) balloonTip.ShowDuration = (Duration)showDuration;
@@ -451,7 +461,7 @@ namespace TestWPF
 
                 timer.Start();
             }
-
+            
             return true;
         }
 
@@ -467,16 +477,9 @@ namespace TestWPF
 
             popupAdorner.ComputedPlacementModeChanged -= PopupAdorner_ComputedPlacementModeChanged;
 
-            var placementTarget = popupAdorner.AdornedElement;
+            var balloonTip = (BalloonTip)popupAdorner.Child;
 
-            var adornerLayer = AdornerLayer.GetAdornerLayer(placementTarget);
-
-            if (adornerLayer != null)
-            {
-                var placementTargetAdorners = adornerLayer.GetAdorners(placementTarget);
-
-                if (placementTargetAdorners.Contains(popupAdorner)) adornerLayer.Remove(popupAdorner);
-            }
+            CloseBalloonTip(balloonTip);
         }
     }
 }

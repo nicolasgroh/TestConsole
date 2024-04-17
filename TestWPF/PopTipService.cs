@@ -240,8 +240,7 @@ namespace TestWPF
 
                         var popTipPopupAdorner = new PopupAdorner(placementTarget)
                         {
-                            Child = popTip,
-                            PlacementMode = PopupAdornerPlacementMode.Top
+                            Child = popTip
                         };
 
                         popTipPopupAdorner.SetBinding(PopupAdorner.PlacementModeProperty, new Binding()

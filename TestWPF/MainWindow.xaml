@@ -34,7 +34,7 @@
                 <local:TableColumnDefinition Width="Auto" MinWidth="50"/>
             </local:TablePanel.ColumnDefinitions>
 
-            <Button Content="Test"/>
+            <Button Content="Test" Click="Button_Click"/>
             <Button Content="Test2"/>
             <Button Content="Test3"/>
             <Button Content="Test4"/>
@@ -83,7 +83,7 @@
             </local:FlexCustomItemsControl>-->
 
         <Canvas Grid.Row="1" x:Name="TestCanvas">
-            <Thumb x:Name="TestThumb" Height="100" Width="150" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:PopTipService.PopTip="Test" local:PopTipService.Trigger="MouseOver"/>
+            <Thumb x:Name="TestThumb" Height="100" Width="150" DragDelta="TestThumb_DragDelta" Canvas.Left="500" Canvas.Top="100" local:PopTipService.PlacementMode="Right" local:PopTipService.PopTip="Test" local:PopTipService.Trigger="MouseOver"/>
         </Canvas>
     </Grid>
 </Window>
