@@ -321,7 +321,7 @@ namespace TestWPF
             return new BalloonTipConfiguration();
         }
 
-        public static void ShowBalloonTip(this UIElement placementTarget, BalloonTipConfiguration configuration)
+        public static void ShowBalloonTip(this UIElement placementTarget, IBalloonTipConfiguration configuration)
         {
             var balloonTip = new BalloonTip();
 

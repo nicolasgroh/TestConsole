@@ -198,22 +198,34 @@ namespace TestWPF
 
         private static void PlacementTarget_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            SetIsOpen((UIElement)sender, true);
+            UpdateIsOpen((UIElement)sender);
         }
 
         private static void PlacementTarget_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            SetIsOpen((UIElement)sender, false);
+            UpdateIsOpen((UIElement)sender);
         }
 
         private static void PlacementTarget_GotFocus(object sender, RoutedEventArgs e)
         {
-            SetIsOpen((UIElement)sender, true);
+            UpdateIsOpen((UIElement)sender);
         }
 
         private static void PlacementTarget_LostFocus(object sender, RoutedEventArgs e)
         {
-            SetIsOpen((UIElement)sender, false);
+            UpdateIsOpen((UIElement)sender);
+        }
+
+        private static void UpdateIsOpen(UIElement placementTarget)
+        {
+            var trigger = GetTrigger(placementTarget);
+
+            bool isOpen = false;
+
+            if ((trigger & PopTipTrigger.MouseOver) == PopTipTrigger.MouseOver && placementTarget.IsMouseOver) isOpen = true;
+            if ((trigger & PopTipTrigger.Focus) == PopTipTrigger.Focus && placementTarget.IsFocused) isOpen = true;
+
+            SetIsOpen(placementTarget, isOpen);
         }
 
         private static void UpdatePopTipVisibility(UIElement placementTarget)
