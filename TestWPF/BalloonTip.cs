@@ -14,31 +14,14 @@ namespace TestWPF
 {
     public class BalloonTip : HeaderedContentControl
     {
-        private class CloseBalloonTipCommand : ICommand
-        {
-            public CloseBalloonTipCommand(BalloonTip balloonTip)
-            {
-                _balloonTip = balloonTip;
-            }
-
-            private readonly BalloonTip _balloonTip;
-
-            public event EventHandler CanExecuteChanged;
-
-            public bool CanExecute(object parameter)
-            {
-                return true;
-            }
-
-            public void Execute(object parameter)
-            {
-                BalloonTipService.CloseBalloonTip(_balloonTip);
-            }
-        }
-
         static BalloonTip()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BalloonTip), new FrameworkPropertyMetadata(typeof(BalloonTip)));
+        }
+
+        public BalloonTip()
+        {
+            CommandBindings.Add(new CommandBinding(CloseCommand, OnClose));
         }
 
         public static readonly DependencyProperty ShowDurationProperty = BalloonTipService.ShowDurationProperty.AddOwner(typeof(BalloonTip), new FrameworkPropertyMetadata(new Duration(TimeSpan.FromSeconds(3))));
@@ -93,15 +76,12 @@ namespace TestWPF
             set { SetValue(KeepWithinViewProperty, value); }
         }
 
-        private ICommand _closeCommmand;
-        public ICommand CloseCommand
-        {
-            get
-            {
-                _closeCommmand ??= new CloseBalloonTipCommand(this);
+        public readonly static RoutedCommand CloseCommand = new RoutedCommand("Close", typeof(BalloonTip));
 
-                return _closeCommmand;
-            }
+        private void OnClose(object sender, ExecutedRoutedEventArgs e)
+        {
+            Close();
+            e.Handled = true;
         }
 
         public void Close()
