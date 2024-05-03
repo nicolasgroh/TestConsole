@@ -345,6 +345,8 @@ namespace TestWPF
 
             if (popupAdorner == null) return;
 
+            popupAdorner.ComputedPlacementModeChanged -= PopupAdorner_ComputedPlacementModeChanged;
+
             var placementTarget = popupAdorner.AdornedElement;
 
             if (placementTarget == null) return;
@@ -474,8 +476,6 @@ namespace TestWPF
             timer.Stop();
 
             var popupAdorner = (PopupAdorner)timer.Tag;
-
-            popupAdorner.ComputedPlacementModeChanged -= PopupAdorner_ComputedPlacementModeChanged;
 
             var balloonTip = (BalloonTip)popupAdorner.Child;
 
