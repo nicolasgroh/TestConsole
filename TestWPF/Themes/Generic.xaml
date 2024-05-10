@@ -500,7 +500,7 @@
                         <local:BeakedBorder x:Name="DisplayBeakedBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" BeakWidth="15" BeakLenght="10">
                             <DockPanel Margin="{TemplateBinding Padding}">
                                 <DockPanel DockPanel.Dock="Top">
-                                    <Button Command="{Binding CloseCommand, RelativeSource={RelativeSource TemplatedParent}}" DockPanel.Dock="Right" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" Width="20" Height="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+                                    <Button Command="local:BalloonTip.CloseCommand" DockPanel.Dock="Right" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" Width="20" Height="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
                                         <Button.Content>
                                             <Path Stroke="Black" StrokeThickness="1">
                                                 <Path.Data>
