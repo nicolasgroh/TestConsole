@@ -10,6 +10,7 @@ using CsvHelper.Configuration.Attributes;
 using CsvHelper.Configuration;
 using System.Windows;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace TestConsole
 {
@@ -17,7 +18,74 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            GetNancyUriViaHttpClient();
+            CSVPrettifier();
+        }
+
+        private static void ScreenParameterCheck()
+        {
+            var folder = @"C:\Users\N.Groh\source\repos\prosoftgmbh\prosoft-malzahn\Frontend.Wpf\Screens";
+
+            var files = new List<string>();
+
+            var csFiles = Directory.GetFiles(folder, "*.cs", SearchOption.AllDirectories);
+            var xamlFiles = Directory.GetFiles(folder, "*.xaml", SearchOption.AllDirectories);
+
+            files.AddRange(csFiles);
+            files.AddRange(xamlFiles);
+
+            var screens = new Dictionary<string, Screen>();
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                var file = files[i];
+
+                var filname = Path.GetFileNameWithoutExtension(file);
+
+                var fileContent = File.ReadAllText(file);
+
+                if (filname.EndsWith(".xaml"))
+                {
+                    var screenName = filname.Substring(0, filname.Length - ".xaml".Length);
+
+                    if (!screens.TryGetValue(screenName, out var screen))
+                    {
+                        screen = new Screen();
+                        screens[screenName] = screen;
+                    }
+
+                    if (fileContent.Contains("switch (e.PropertyName)"))
+                    {
+                        screen.HasParameters = true;
+                    }
+                }
+                else
+                {
+                    if (!screens.TryGetValue(filname, out var screen))
+                    {
+                        screen = new Screen();
+                        screens[filname] = screen;
+                    }
+
+                    if (fileContent.Contains("Type=\"Pane\""))
+                    {
+                        screen.IsPane = true;
+                    }
+                }
+            }
+
+            foreach (var screen in screens)
+            {
+                if (screen.Value.IsPane && screen.Value.HasParameters) Console.WriteLine(screen.Key);
+            }
+
+            Console.ReadLine();
+        }
+
+        private class Screen
+        {
+            public bool IsPane { get; set; }
+
+            public bool HasParameters { get; set; }
         }
 
         #region Gimeg SalesOrder Parsen
@@ -684,6 +752,7 @@ namespace TestConsole
 
                 var nancyUri = resultContent.Result;
 
+                Console.WriteLine("NancyUri:");
                 Console.WriteLine(nancyUri);
                 Console.ReadLine();
             }
@@ -729,7 +798,7 @@ namespace TestConsole
 
     public class DelegateAttribute
     {
-        
+
     }
 
     public class CSVFormatAttribute : Attribute
